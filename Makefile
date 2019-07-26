@@ -1,5 +1,5 @@
 #/***************************************************************************
-# mbb-qgis-plugin
+# mbb_qgis_plugin
 #
 #  A tool to automatically set up QGIS Atlas layouts
 
@@ -39,15 +39,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	mbb-core.py mbb-core_dialog.py
+	mbb_code.py mbb_code_dialog.py
 
-PLUGINNAME = mbb-core
+PLUGINNAME = mbb_code
 
 PY_FILES = \
 	__init__.py \
-	mbb-core.py mbb-core_dialog.py
+	mbb_code.py mbb_code_dialog.py
 
-UI_FILES = mbb-core_dialog_base.ui
+UI_FILES = mbb_code_dialog_base.ui
 
 EXTRAS = metadata.txt icon.png
 
@@ -85,7 +85,7 @@ default:
 	@echo A Python script, pb_tool provides platform independent management of
 	@echo your plugins and runs anywhere.
 	@echo You can install pb_tool using: pip install pb_tool
-	@echo See https://g-sherman.github.io/plugin_build_tool/ for info. 
+	@echo See https://g-sherman.github.io/plugin_build_tool/ for info.
 
 compile: $(COMPILED_RESOURCE_FILES)
 

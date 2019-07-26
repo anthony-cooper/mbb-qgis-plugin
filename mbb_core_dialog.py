@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- mbb-qgis-pluginDialog
+ mbb_qgis_pluginDialog
                                  A QGIS plugin
   A tool to automatically set up QGIS Atlas layouts
 
@@ -30,13 +30,13 @@ from qgis.PyQt import QtWidgets
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'mbb-core_dialog_base.ui'))
+    os.path.dirname(__file__), 'mbb_core_dialog_base.ui'))
 
 
-class mbb-qgis-pluginDialog(QtWidgets.QDialog, FORM_CLASS):
+class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
-        super(mbb-qgis-pluginDialog, self).__init__(parent)
+        super(mbb_qgis_pluginDialog, self).__init__(parent)
         # Set up the user interface from Designer through FORM_CLASS.
         # After self.setupUi() you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see

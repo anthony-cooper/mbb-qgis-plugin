@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- mbb-qgis-plugin
+ mbb_qgis_plugin
                                  A QGIS plugin
   A tool to automatically set up QGIS Atlas layouts
 
@@ -29,11 +29,11 @@ from qgis.PyQt.QtWidgets import QAction
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
-from .mbb-core_dialog import mbb-qgis-pluginDialog
+from .mbb_core_dialog import mbb_qgis_pluginDialog
 import os.path
 
 
-class mbb-qgis-plugin:
+class mbb_qgis_plugin:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -53,7 +53,7 @@ class mbb-qgis-plugin:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'mbb-qgis-plugin_{}.qm'.format(locale))
+            'mbb_qgis_plugin_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -81,7 +81,7 @@ class mbb-qgis-plugin:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('mbb-qgis-plugin', message)
+        return QCoreApplication.translate('mbb_qgis_plugin', message)
 
 
     def add_action(
@@ -161,7 +161,7 @@ class mbb-qgis-plugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/mbb-core/icon.png'
+        icon_path = ':/plugins/mbb_core/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Map Book Builder'),
@@ -188,7 +188,7 @@ class mbb-qgis-plugin:
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
         if self.first_start == True:
             self.first_start = False
-            self.dlg = mbb-qgis-pluginDialog()
+            self.dlg = mbb_qgis_pluginDialog()
 
         # show the dialog
         self.dlg.show()

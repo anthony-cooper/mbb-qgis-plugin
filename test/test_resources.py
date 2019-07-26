@@ -18,7 +18,7 @@ from qgis.PyQt.QtGui import QIcon
 
 
 
-class mbb-qgis-pluginDialogTest(unittest.TestCase):
+class mbb_qgis_pluginDialogTest(unittest.TestCase):
     """Test rerources work."""
 
     def setUp(self):
@@ -31,14 +31,11 @@ class mbb-qgis-pluginDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ':/plugins/mbb-qgis-plugin/icon.png'
+        path = ':/plugins/mbb_qgis_plugin/icon.png'
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 
 if __name__ == "__main__":
-    suite = unittest.makeSuite(mbb-qgis-pluginResourcesTest)
+    suite = unittest.makeSuite(mbb_qgis_pluginResourcesTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
-
-

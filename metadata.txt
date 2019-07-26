@@ -13,8 +13,8 @@ email=anthony.cooper@outlook.com
 
 about=A tool to automatically set up QGIS Atlas layouts
 
-tracker=https://github.com/anthony-cooper/mbb-qgis-plugin/issues
-repository=https://github.com/anthony-cooper/mbb-qgis-plugin
+tracker=https://github.com/anthony-cooper/mbb_qgis_plugin/issues
+repository=https://github.com/anthony-cooper/mbb_qgis_plugin
 # End of mandatory metadata
 
 # Recommended items:
@@ -45,4 +45,3 @@ Category of the plugin: Raster, Vector, Database or Web
 
 # If the plugin can run on QGIS Server.
 server=False
-

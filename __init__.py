@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- mbb-qgis-plugin
+ mbb_qgis_plugin
                                  A QGIS plugin
   A tool to automatically set up QGIS Atlas layouts
 
@@ -27,11 +27,11 @@
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
-    """Load mbb-qgis-plugin class from file mbb-qgis-plugin.
+    """Load mbb_qgis_plugin class from file mbb_qgis_plugin.
 
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
     #
-    from .mbb-core import mbb-qgis-plugin
-    return mbb-qgis-plugin(iface)
+    from .mbb_core import mbb_qgis_plugin
+    return mbb_qgis_plugin(iface)

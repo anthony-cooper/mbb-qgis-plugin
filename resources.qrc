@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/mbb-core" >
+    <qresource prefix="/plugins/mbb_code" >
         <file>icon.png</file>
     </qresource>
 </RCC>

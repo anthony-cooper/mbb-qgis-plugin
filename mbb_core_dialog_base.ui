@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>mbb-qgis-pluginDialogBase</class>
- <widget class="QDialog" name="mbb-qgis-pluginDialogBase" >
+ <class>mbb_qgis_pluginDialogBase</class>
+ <widget class="QDialog" name="mbb_qgis_pluginDialogBase" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -34,7 +34,7 @@
   <connection>
    <sender>button_box</sender>
    <signal>accepted()</signal>
-   <receiver>mbb-qgis-pluginDialogBase</receiver>
+   <receiver>mbb_qgis_pluginDialogBase</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="source_label" >
@@ -50,7 +50,7 @@
   <connection>
    <sender>button_box</sender>
    <signal>rejected()</signal>
-   <receiver>mbb-qgis-pluginDialogBase</receiver>
+   <receiver>mbb_qgis_pluginDialogBase</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="source_label" >
