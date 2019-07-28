@@ -1,0 +1,11 @@
+File Title Line,,,,,,,,,
+Template Key Features,,,,,,,,,
+Main Map,Basemap,Basemap Overlay,,Scale,Extents,Position,Size,Above Layers,Below Layers
+Super Map,Basemap,Basemap Overlay,Leader Lines,Scale,Extents,Position,Size,Above Layers,Below Layers
+Sub Map 1,Basemap,Basemap Overlay,Leader Lines,Scale,Extents,Position,Size,Above Layers,Below Layers
+Sub Map 2,Basemap,Basemap Overlay,Leader Lines,Scale,Extents,Position,Size,Above Layers,Below Layers
+Sub Map 3,Basemap,Basemap Overlay,Leader Lines,Scale,Extents,Position,Size,Above Layers,Below Layers
+Consistent Layers,,,,,,,,,
+Dynamic Layers,,,,,,,,,
+Legend,,,,,,,,,
+<<End_of_Header>>,,,,,,,,,
