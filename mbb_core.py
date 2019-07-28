@@ -161,7 +161,7 @@ class mbb_qgis_plugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/mbb_core/icon.png'
+        icon_path = ':/plugins/mbb-qgis-plugin/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Map Book Builder'),
@@ -198,4 +198,14 @@ class mbb_qgis_plugin:
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            pass
+            print('build_layout')
+
+            #Read mbbconfig files
+
+            #Build core layout
+
+            #Read in mbbconfig as layer
+
+            #Assign dynamic values to Atlas
+
+            #Turn on atlas mode
