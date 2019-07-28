@@ -25,6 +25,7 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.core import *
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -209,3 +210,11 @@ class mbb_qgis_plugin:
             #Assign dynamic values to Atlas
 
             #Turn on atlas mode
+
+    def load_all_layers(self, group, layers):
+        for child in group:
+            if isinstance(child, QgsLayerTreeLayer):
+                layers.append(child)
+            elif isinstance(child, QgsLayerTreeGroup):
+                layers = self.load_all_layers(child.children(), layers)
+        return layers

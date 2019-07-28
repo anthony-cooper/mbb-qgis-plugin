@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>689</width>
+    <width>870</width>
     <height>756</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>671</width>
+     <width>851</width>
      <height>671</height>
     </rect>
    </property>
@@ -190,7 +190,7 @@ p, li { white-space: pre-wrap; }
       </property>
      </column>
     </widget>
-    <widget class="QgsOpacityWidget" name="mainOverlayT">
+    <widget class="QgsOpacityWidget" name="mainOverlayT" native="true">
      <property name="geometry">
       <rect>
        <x>360</x>
@@ -199,7 +199,7 @@ p, li { white-space: pre-wrap; }
        <height>27</height>
       </rect>
      </property>
-     <property name="opacity">
+     <property name="opacity" stdset="0">
       <double>0.500000000000000</double>
      </property>
     </widget>
@@ -306,10 +306,10 @@ p, li { white-space: pre-wrap; }
     <widget class="QListWidget" name="previewList">
      <property name="geometry">
       <rect>
-       <x>450</x>
-       <y>90</y>
-       <width>211</width>
-       <height>571</height>
+       <x>10</x>
+       <y>520</y>
+       <width>831</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="horizontalScrollBarPolicy">
@@ -334,9 +334,9 @@ p, li { white-space: pre-wrap; }
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>450</x>
-       <y>70</y>
-       <width>211</width>
+       <x>10</x>
+       <y>500</y>
+       <width>311</width>
        <height>21</height>
       </rect>
      </property>
@@ -344,107 +344,13 @@ p, li { white-space: pre-wrap; }
       <string>Dynamic Items Order Preview</string>
      </property>
     </widget>
-    <widget class="QFrame" name="Events">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>70</y>
-       <width>431</width>
-       <height>191</height>
-      </rect>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Events</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="eAdd">
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>40</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Add Event</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="eRemove">
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>70</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Remove Event</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="eMoveUp">
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>160</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Move Event Up</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="eIncrease">
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>10</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Increase Priority</string>
-      </property>
-     </widget>
-     <widget class="QListWidget" name="eList">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>20</y>
-        <width>301</width>
-        <height>171</height>
-       </rect>
-      </property>
-      <property name="alternatingRowColors">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </widget>
     <widget class="QFrame" name="Types">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>270</y>
-       <width>431</width>
-       <height>191</height>
+       <y>70</y>
+       <width>231</width>
+       <height>431</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -469,8 +375,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="tAdd">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>40</y>
+        <x>0</x>
+        <y>370</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -478,12 +384,15 @@ p, li { white-space: pre-wrap; }
       <property name="text">
        <string>Add Type</string>
       </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
      </widget>
      <widget class="QPushButton" name="tRemove">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>70</y>
+        <x>0</x>
+        <y>400</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -495,8 +404,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="tMoveUp">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>160</y>
+        <x>120</x>
+        <y>400</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -508,8 +417,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="tIncrease">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>10</y>
+        <x>120</x>
+        <y>370</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -523,8 +432,8 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>0</x>
         <y>20</y>
-        <width>301</width>
-        <height>171</height>
+        <width>231</width>
+        <height>341</height>
        </rect>
       </property>
       <property name="alternatingRowColors">
@@ -532,13 +441,13 @@ p, li { white-space: pre-wrap; }
       </property>
      </widget>
     </widget>
-    <widget class="QFrame" name="Types_2">
+    <widget class="QFrame" name="Scenarios">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>470</y>
-       <width>431</width>
-       <height>191</height>
+       <x>490</x>
+       <y>70</y>
+       <width>351</width>
+       <height>431</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -563,8 +472,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="sAdd">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>40</y>
+        <x>0</x>
+        <y>370</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -573,24 +482,24 @@ p, li { white-space: pre-wrap; }
        <string>Add Scenario</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="tRemove_3">
+     <widget class="QPushButton" name="sRemove">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>70</y>
-        <width>111</width>
+        <x>0</x>
+        <y>400</y>
+        <width>231</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Remove Scenario</string>
+       <string>Remove (Sub-)Scenario</string>
       </property>
      </widget>
      <widget class="QPushButton" name="sMoveUp">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>160</y>
+        <x>240</x>
+        <y>400</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -602,8 +511,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="sIncrease">
       <property name="geometry">
        <rect>
-        <x>310</x>
-        <y>10</y>
+        <x>240</x>
+        <y>370</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -612,20 +521,26 @@ p, li { white-space: pre-wrap; }
        <string>Increase Priority</string>
       </property>
      </widget>
-     <widget class="QTreeWidget" name="treeWidget">
+     <widget class="QTreeWidget" name="sTree">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>20</y>
-        <width>301</width>
-        <height>171</height>
+        <width>351</width>
+        <height>341</height>
        </rect>
       </property>
       <property name="lineWidth">
        <number>0</number>
       </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
       <property name="selectionBehavior">
        <enum>QAbstractItemView::SelectItems</enum>
+      </property>
+      <property name="autoExpandDelay">
+       <number>0</number>
       </property>
       <property name="itemsExpandable">
        <bool>true</bool>
@@ -650,6 +565,113 @@ p, li { white-space: pre-wrap; }
         <string notr="true">1</string>
        </property>
       </column>
+     </widget>
+     <widget class="QPushButton" name="sAdd_2">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>370</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Add Sub-Scenario</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="Events">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>70</y>
+       <width>231</width>
+       <height>431</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Events</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="eAdd">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>370</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Add Event</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="eRemove">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>400</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove Event</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="eMoveUp">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>400</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Move Event Up</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="eIncrease">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>370</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Increase Priority</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="eList">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>20</y>
+        <width>231</width>
+        <height>341</height>
+       </rect>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
    </widget>
@@ -679,7 +701,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="nextButton">
    <property name="geometry">
     <rect>
-     <x>490</x>
+     <x>670</x>
      <y>720</y>
      <width>93</width>
      <height>28</height>
@@ -692,7 +714,7 @@ p, li { white-space: pre-wrap; }
   <widget class="QDialogButtonBox" name="cancelButton">
    <property name="geometry">
     <rect>
-     <x>590</x>
+     <x>770</x>
      <y>720</y>
      <width>91</width>
      <height>28</height>
@@ -708,7 +730,7 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="geometry">
     <rect>
-     <x>390</x>
+     <x>570</x>
      <y>720</y>
      <width>93</width>
      <height>28</height>

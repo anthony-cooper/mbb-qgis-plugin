@@ -27,6 +27,9 @@ import os
 
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
+from qgis.PyQt.QtWidgets import *
+from qgis.core import *
+
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -46,10 +49,18 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.stackedWidget.setCurrentIndex(0)
         self.update_buttons()
-
         self.stackedWidget.currentChanged.connect(self.update_buttons)
         self.nextButton.clicked.connect(self.__next__)
         self.prevButton.clicked.connect(self.prev)
+        self.tAdd.clicked.connect(lambda: self.addDynamicItem(0))
+        self.eAdd.clicked.connect(lambda: self.addDynamicItem(1))
+        self.sAdd.clicked.connect(lambda: self.addDynamicItem(2))
+        self.sAdd_2.clicked.connect(lambda: self.addDynamicItem(3))
+        self.sTree.clear()
+        self.eList.clear()
+        self.tList.clear()
+
+
 
 
     def  update_buttons(self):
@@ -72,15 +83,15 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
         #Check valid entry for sheet #, and prep next sheet
         if i == 0:                          #Setup
-            validEntry = self.setupFiles()
+            validEntry = self.setup()
         if i == 1:                          #Template
-            validEntry = self.setupFiles()
+            validEntry = self.setup()
         if i == 2:                          #Consistent
-            validEntry = self.setupFiles()
+            validEntry = self.setup()
         if i == 3:                          #Dynamic
             validEntry = self.dynamicLayersList()
         if i == 4:                          #Review
-            validEntry = self.setupFiles()
+            validEntry = self.setup()
 
 
 
@@ -91,7 +102,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             else:
                 self.accept()   #return to main run, do the generation
 
-    def setupFiles(self):
+    def setup(self):
         #If using existing template is it valid file
             #return False
 
@@ -100,23 +111,28 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
         #Take template (default or existing) and load in data
 
+        self.layers = []
+
+        # Fetch the currently loaded layers
+        self.layers = self.load_all_layers(QgsProject.instance().layerTreeRoot().children(), self.layers)
+
 
 
         return True
 
     def dynamicLayersList(self):
-        layers = ['FloodModel_BASE_0020_d_Max', 'FloodModel_BASE_0020_h_Max', 'FloodModel_BASE_0020_TMax_h', 'FloodModel_BASE_0020_TMax_V', 'FloodModel_BASE_0020_V_Max', 'FloodModel_BASE_0020_ZUK0_Max', 'FloodModel_BASE_0020_ZUK1_Max', 'FloodModel_BASE_0100_d_Max', 'FloodModel_BASE_0100_h_Max', 'FloodModel_BASE_0100_TMax_h', 'FloodModel_BASE_0100_TMax_V', 'FloodModel_BASE_0100_V_Max', 'FloodModel_BASE_0100_ZUK0_Max', 'FloodModel_BASE_0100_ZUK1_Max', 'FloodModel_BASE_C100_d_025_46', 'FloodModel_BASE_C100_d_Max', 'FloodModel_BASE_C100_h_025_46', 'FloodModel_BASE_C100_h_Max', 'FloodModel_BASE_C100_MB1_025_46', 'FloodModel_BASE_C100_q_025_46', 'FloodModel_BASE_C100_TMax_h', 'FloodModel_BASE_C100_TMax_V', 'FloodModel_BASE_C100_V_025_46', 'FloodModel_BASE_C100_V_Max', 'FloodModel_BASE_C100_ZUK0_025_46', 'FloodModel_BASE_C100_ZUK0_Max', 'FloodModel_BASE_C100_ZUK1_025_46', 'FloodModel_BASE_C100_ZUK1_Max', 'FloodModel_DEVELOPED_0100_d_Max', 'FloodModel_DEVELOPED_0100_h_Max', 'FloodModel_DEVELOPED_0100_TMax_h', 'FloodModel_DEVELOPED_0100_TMax_V', 'FloodModel_DEVELOPED_0100_V_Max', 'FloodModel_DEVELOPED_0100_ZUK0_Max', 'FloodModel_DEVELOPED_0100_ZUK1_Max', 'FloodModel_DEVELOPED-DEFENDED_0100_d_Max', 'FloodModel_DEVELOPED-DEFENDED_0100_h_Max', 'FloodModel_DEVELOPED-DEFENDED_0100_TMax_h', 'FloodModel_DEVELOPED-DEFENDED_0100_TMax_V', 'FloodModel_DEVELOPED-DEFENDED_0100_V_Max', 'FloodModel_DEVELOPED-DEFENDED_0100_ZUK0_Max', 'FloodModel_DEVELOPED-DEFENDED_0100_ZUK1_Max', 'FloodModel_DEVELOPED-DEFENDED_C100_d_Max', 'FloodModel_DEVELOPED-DEFENDED_C100_h_Max', 'FloodModel_DEVELOPED-DEFENDED_C100_TMax_h', 'FloodModel_DEVELOPED-DEFENDED_C100_TMax_V', 'FloodModel_DEVELOPED-DEFENDED_C100_V_Max', 'FloodModel_DEVELOPED-DEFENDED_C100_ZUK0_Max', 'FloodModel_DEVELOPED-DEFENDED_C100_ZUK1_Max']
-        searchLists = []
-        searchLists.append(['h_Max', 'd_Max'])
-        searchLists.append(['0020', '0100', 'C100'])
-        searchLists.append([['BASE',['']],['DEVELOPED',['','DEFENDED']]])
+        layers = self.layers.copy()
+        searchLists = [[],[],[]]
+        searchLists[0] = (['h_Max', 'd_Max'])
+        searchLists[1] = (['0020', '0100', 'C100'])
+        searchLists[2] = ([['BASE',['']],['DEVELOPED',['','DEFENDED']]])
 
         for searchList in searchLists:
             layers = self.deepSearch(layers,searchList)
-            #print(layers)
-        print('Final')
-        print(layers)
-        return true
+
+        self.previewList.clear()
+        for layer in layers:
+            self.previewList.addItem(layer.name())
 
     def deepSearch(self, layers, searchList):
         output = []
@@ -128,11 +144,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                     if (search[0] == '') and (len(searchList) > 1):
                         negSearch = searchList.copy()
                         negSearch.remove(search)
-                        if any(x[0] not in layer for x in negSearch):
+                        if any(x[0] not in layer.name() for x in negSearch):
                             output.append(layer)
                             found.append(layer)
                     else:
-                        if search[0] in layer:
+                        if search[0] in layer.name():
                             research.append(layer)
                             found.append(layer)
                 for layer in found:
@@ -145,11 +161,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                     if (search == '') and (len(searchList) > 1):
                         negSearch = searchList.copy()
                         negSearch.remove(search)
-                        if any(x not in layer for x in negSearch):
+                        if any(x not in layer.name() for x in negSearch):
                             output.append(layer)
                             found.append(layer)
                     else:
-                        if search in layer:
+                        if search in layer.name():
                             output.append(layer)
                             found.append(layer)
                 for layer in found:
@@ -158,6 +174,21 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
         return output
+
+    def addDynamicItem(self,ty):
+        item = 'str'
+        if ty == 0:
+            self.tList.addItem(item)
+        elif ty == 1:
+            self.eList.addItem(item)
+        elif ty == 2:
+            twi = QTreeWidgetItem(self.sTree,[item],0)
+            twi.addChild(QTreeWidgetItem(['Others'],0))
+            self.sTree.expandItem(twi)
+        elif ty == 3:
+            twi = self.sTree.currentItem()
+            twi.addChild(QTreeWidgetItem([item],0))
+            self.sTree.expandItem(twi)
 
 
     def load_all_layers(self, group, layers):
