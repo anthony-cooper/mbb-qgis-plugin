@@ -29,6 +29,8 @@ from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtWidgets import *
 from qgis.core import *
+from .mbb_core_dialog_additem import mbb_dialog_additem
+
 
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
@@ -37,6 +39,8 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 
 class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
+
+
     def __init__(self, parent=None):
         """Constructor."""
         super(mbb_qgis_pluginDialog, self).__init__(parent)
@@ -56,9 +60,13 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.eAdd.clicked.connect(lambda: self.addDynamicItem(1))
         self.sAdd.clicked.connect(lambda: self.addDynamicItem(2))
         self.sAdd_2.clicked.connect(lambda: self.addDynamicItem(3))
+        self.sMoveUp.clicked.connect(lambda: self.createSearchList(self.tTree))
         self.sTree.clear()
-        self.eList.clear()
-        self.tList.clear()
+        self.eTree.clear()
+        self.tTree.clear()
+
+        self.otherItem = 'Others'
+
 
 
 
@@ -123,12 +131,13 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def dynamicLayersList(self):
         layers = self.layers.copy()
         searchLists = [[],[],[]]
-        searchLists[0] = (['h_Max', 'd_Max'])
-        searchLists[1] = (['0020', '0100', 'C100'])
-        searchLists[2] = ([['BASE',['']],['DEVELOPED',['','DEFENDED']]])
+        searchLists[0] = self.createSearchList(self.tTree)
+        searchLists[1] = self.createSearchList(self.eTree)
+        searchLists[2] = self.createSearchList(self.sTree)
 
         for searchList in searchLists:
             layers = self.deepSearch(layers,searchList)
+
 
         self.previewList.clear()
         for layer in layers:
@@ -141,6 +150,9 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             found = []
             if type(search) == list:
                 for layer in layers:
+
+                    if search[0] == self.otherItem:
+                        search[0] = ''
                     if (search[0] == '') and (len(searchList) > 1):
                         negSearch = searchList.copy()
                         negSearch.remove(search)
@@ -158,6 +170,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             else:
 
                 for layer in layers:
+                    if search == self.otherItem:
+                        search = ''
                     if (search == '') and (len(searchList) > 1):
                         negSearch = searchList.copy()
                         negSearch.remove(search)
@@ -176,20 +190,58 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         return output
 
     def addDynamicItem(self,ty):
-        item = 'str'
-        if ty == 0:
-            self.tList.addItem(item)
-        elif ty == 1:
-            self.eList.addItem(item)
-        elif ty == 2:
-            twi = QTreeWidgetItem(self.sTree,[item],0)
-            twi.addChild(QTreeWidgetItem(['Others'],0))
-            self.sTree.expandItem(twi)
-        elif ty == 3:
-            twi = self.sTree.currentItem()
-            twi.addChild(QTreeWidgetItem([item],0))
-            self.sTree.expandItem(twi)
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            item = self.additem_dlg.coreText.text()
+            if ty == 0:
+                twi = QTreeWidgetItem(self.tTree,[item],0)
+                #twi.addChild(QTreeWidgetItem([self.otherItem],0))
+                #self.tTree.expandItem(twi)
+            elif ty == 1:
+                twi = QTreeWidgetItem(self.eTree,[item],0)
+                #twi.addChild(QTreeWidgetItem([self.otherItem],0))
+                #self.eTree.expandItem(twi)
+            elif ty == 2:
+                twi = QTreeWidgetItem(self.sTree,[item],0)
+                twi.addChild(QTreeWidgetItem([self.otherItem],0))
+                self.sTree.expandItem(twi)
+            elif ty == 3:
+                twi = self.sTree.currentItem()
+                twi = QTreeWidgetItem(twi,[item],0)
+                twi.addChild(QTreeWidgetItem([self.otherItem],0))
+                self.sTree.expandItem(twi)
+                self.sTree.expandItem(twi)
 
+            self.dynamicLayersList()
+
+    def createSearchList(self, treeWidget):
+        items = []
+        searchList = []
+        for idx in range(treeWidget.topLevelItemCount()):
+            items.append(treeWidget.topLevelItem(idx))
+        searchList = self.createSearchLists(items)
+        return searchList
+
+    def createSearchLists(self, levelItems):
+        searchList = []
+        if any(item.childCount() != 0 for item in levelItems):
+            for item in levelItems:
+                if item.childCount() != 0 :
+                    items = []
+                    for idx in range(item.childCount()):
+                        items.append(item.child(idx))
+                    rList = self.createSearchLists(items)
+                else:
+                    rList = ['']
+
+                searchList.append([item.text(0), rList])
+        else:
+            for item in levelItems:
+                searchList.append(item.text(0))
+
+        return searchList
 
     def load_all_layers(self, group, layers):
         for child in group:

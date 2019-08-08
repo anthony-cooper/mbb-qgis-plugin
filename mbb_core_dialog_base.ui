@@ -427,7 +427,7 @@ p, li { white-space: pre-wrap; }
        <string>Increase Priority</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="tList">
+     <widget class="QTreeWidget" name="tTree">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -436,9 +436,44 @@ p, li { white-space: pre-wrap; }
         <height>341</height>
        </rect>
       </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
       <property name="alternatingRowColors">
        <bool>true</bool>
       </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectItems</enum>
+      </property>
+      <property name="autoExpandDelay">
+       <number>0</number>
+      </property>
+      <property name="itemsExpandable">
+       <bool>true</bool>
+      </property>
+      <property name="sortingEnabled">
+       <bool>false</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="columnCount">
+       <number>1</number>
+      </property>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="headerMinimumSectionSize">
+       <number>49</number>
+      </attribute>
+      <attribute name="headerShowSortIndicator" stdset="0">
+       <bool>false</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
      </widget>
     </widget>
     <widget class="QFrame" name="Scenarios">
@@ -660,7 +695,7 @@ p, li { white-space: pre-wrap; }
        <string>Increase Priority</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="eList">
+     <widget class="QTreeWidget" name="eTree">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -669,9 +704,41 @@ p, li { white-space: pre-wrap; }
         <height>341</height>
        </rect>
       </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
       <property name="alternatingRowColors">
        <bool>true</bool>
       </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectItems</enum>
+      </property>
+      <property name="autoExpandDelay">
+       <number>0</number>
+      </property>
+      <property name="itemsExpandable">
+       <bool>true</bool>
+      </property>
+      <property name="sortingEnabled">
+       <bool>false</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+      <property name="columnCount">
+       <number>1</number>
+      </property>
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="headerShowSortIndicator" stdset="0">
+       <bool>false</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
      </widget>
     </widget>
    </widget>
