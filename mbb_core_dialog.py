@@ -60,6 +60,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.eAdd.clicked.connect(lambda: self.addDynamicItem(1))
         self.sAdd.clicked.connect(lambda: self.addDynamicItem(2))
         self.sAdd_2.clicked.connect(lambda: self.addDynamicItem(3))
+        self.tRemove.clicked.connect(lambda: self.removeDynamicItem(0))
+        self.eRemove.clicked.connect(lambda: self.removeDynamicItem(1))
+        self.sRemove.clicked.connect(lambda: self.removeDynamicItem(2))
+
+
         self.sMoveUp.clicked.connect(lambda: self.createSearchList(self.tTree))
         self.sTree.clear()
         self.eTree.clear()
@@ -215,6 +220,26 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.sTree.expandItem(twi)
 
             self.dynamicLayersList()
+
+    def removeDynamicItem(self,ty):
+        if ty == 0:
+            tw = self.tTree
+        elif ty == 1:
+            tw = self.eTree
+        elif ty == 2:
+            tw = self.sTree
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx != -1:
+                tw.takeTopLevelItem(idx)
+            else:
+                twi = item.parent()
+                idx = twi.indexOfChild(item)
+                twi.takeChild(idx)
+
+
+        self.dynamicLayersList()
 
     def createSearchList(self, treeWidget):
         items = []
