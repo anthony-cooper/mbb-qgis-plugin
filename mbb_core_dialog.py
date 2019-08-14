@@ -24,7 +24,7 @@
 """
 
 import os
-
+import csv
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtWidgets import *
@@ -70,7 +70,21 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.eTree.clear()
         self.tTree.clear()
 
-        self.otherItem = 'Others'
+        self.otherItem = 'All (Other) Items'
+
+        #defaults for setup file
+        self.templateQMS = ['TEMPLATE NAME', ]
+        self.mapsdetailsQMS = [['MAIN MAP'], ['SUPER MAP']]
+        self.consistentQMS = ['CONSISTENT ITEMS']
+        self.dynamicQMS = ['DYNAMIC ITEMS']
+        self.legendQMS = ['LEGEND DETAILS']
+
+        self.mapsQMS = []
+        self.mainMapQMS = ["MainMap_Name", "MainMap_Scale", "MainMap_Orientation", "MainMap_Layers"]
+        self.mapsQMS.extend(self.mainMapQMS)
+        self.otherItemsQMS = []
+
+
 
 
 
@@ -102,7 +116,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         if i == 2:                          #Consistent
             validEntry = self.setup()
         if i == 3:                          #Dynamic
-            validEntry = self.dynamicLayersList()
+            validEntry = self.setup()
         if i == 4:                          #Review
             validEntry = self.setup()
 
@@ -113,6 +127,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.stackedWidget.setCurrentIndex(i + 1)   #move to next
                 self.update_buttons()   #update the buttons
             else:
+                self.writeSetupFile()
                 self.accept()   #return to main run, do the generation
 
     def setup(self):
@@ -121,6 +136,9 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
         #If saving new copy is it valid location
             #return False
+
+        self.setupPath = os.path.abspath(QgsProject.instance().homePath())
+        self.setupName = 'test'
 
         #Take template (default or existing) and load in data
 
@@ -132,6 +150,30 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
         return True
+
+    def writeSetupFile(self):
+        #Prep header
+        headerQMS = []
+        headerQMS.append(['<<HEADER>>', len(self.mapsQMS)+6])
+        headerQMS.append(self.templateQMS)
+        headerQMS.extend(self.mapsdetailsQMS)
+        headerQMS.append(self.consistentQMS)
+        headerQMS.append(self.dynamicQMS)
+        headerQMS.append(self.legendQMS)
+        headerQMS.append(['<<END OF HEADER>>'])
+
+        layersHeaderQMS = []
+        layersHeaderQMS.extend(self.mapsQMS)
+        layersHeaderQMS.extend(self.otherItemsQMS)
+
+
+        if os.path.exists(os.path.join(self.setupPath, self.setupName + ".QMapSetup")):
+            os.remove(os.path.join(self.setupPath, self.setupName + ".QMapSetup"))
+
+        with open(os.path.join(self.setupPath, self.setupName + ".QMapSetup"), 'w+', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(headerQMS)
+            writer.writerow(layersHeaderQMS)
 
     def dynamicLayersList(self):
         layers = self.layers.copy()
