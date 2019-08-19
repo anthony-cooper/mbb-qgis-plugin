@@ -31,7 +31,8 @@ from qgis.core import *
 from .resources import *
 # Import the code for the dialog
 from .mbb_core_dialog import mbb_qgis_pluginDialog
-import os.path
+import os
+import csv
 
 
 class mbb_qgis_plugin:
@@ -199,22 +200,16 @@ class mbb_qgis_plugin:
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            print('build_layout')
+            QMSFile = self.dlg.returnValues()
+            #Read QMS file
+            with open(QMSFile, newline='') as csvfile:
+                reader = list(csv.reader(csvfile, delimiter=','))
+                headerLength = reader[0][1]
 
-            #Read mbbconfig files
-
+            #Read in QMS as layer
+            QMSLayer = self.iface.addVectorLayer("file:///" + QMSFile + "?type=csv&skipLines="+headerLength+"&detectTypes=yes&xField=MainMap_X&yField=MainMap_Y&crs="+QgsProject.instance().crs().authid()+"&spatialIndex=no&subsetIndex=no&watchFile=no", "MapBookBuilder","delimitedtext")
             #Build core layout
-
-            #Read in mbbconfig as layer
 
             #Assign dynamic values to Atlas
 
             #Turn on atlas mode
-
-    def load_all_layers(self, group, layers):
-        for child in group:
-            if isinstance(child, QgsLayerTreeLayer):
-                layers.append(child)
-            elif isinstance(child, QgsLayerTreeGroup):
-                layers = self.load_all_layers(child.children(), layers)
-        return layers

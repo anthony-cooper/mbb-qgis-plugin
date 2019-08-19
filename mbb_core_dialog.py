@@ -80,10 +80,13 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.legendQMS = ['LEGEND DETAILS']
 
         self.mapsQMS = []
-        self.mainMapQMS = ["MainMap_Name", "MainMap_Scale", "MainMap_Orientation", "MainMap_Layers"]
+        self.mainMapQMS = ["MainMap_X", "MainMap_Y", "MainMap_Name", "MainMap_Scale", "MainMap_Orientation", "MainMap_Layers"]
         self.mapsQMS.extend(self.mainMapQMS)
         self.otherItemsQMS = []
 
+        self.mapSheetsQMS = [[1,2,3,4,5,6,7]]
+
+        self.testvalue = 999
 
 
 
@@ -154,7 +157,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def writeSetupFile(self):
         #Prep header
         headerQMS = []
-        headerQMS.append(['<<HEADER>>', len(self.mapsQMS)+6])
+        headerQMS.append(['<<HEADER>>', len(self.mapsdetailsQMS)+6])
         headerQMS.append(self.templateQMS)
         headerQMS.extend(self.mapsdetailsQMS)
         headerQMS.append(self.consistentQMS)
@@ -174,6 +177,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             writer = csv.writer(file)
             writer.writerows(headerQMS)
             writer.writerow(layersHeaderQMS)
+            writer.writerows(self.mapSheetsQMS)
+
+    def returnValues(self):
+        return os.path.join(self.setupPath, self.setupName + ".QMapSetup")
+
 
     def dynamicLayersList(self):
         layers = self.layers.copy()
