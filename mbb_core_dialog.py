@@ -80,13 +80,13 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.legendQMS = ['LEGEND DETAILS']
 
         self.mapsQMS = []
-        self.mainMapQMS = ["MainMap_X", "MainMap_Y", "MainMap_Name", "MainMap_Scale", "MainMap_Orientation", "MainMap_Layers"]
+        self.mainMapQMS = ["MainMap_X", "MainMap_Y", "MainMap_Scale", "MainMap_Orientation", "MainMap_Layers"]
         self.mapsQMS.extend(self.mainMapQMS)
         self.otherItemsQMS = []
 
-        self.mapSheetsQMS = [[1,2,3,4,5,6,7]]
+        self.mapSheetsQMS = [[1,2,3,4,'TEST',6,7]]
 
-        self.testvalue = 999
+        self.mapName = 'TEST'
 
 
 
@@ -157,13 +157,15 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def writeSetupFile(self):
         #Prep header
         headerQMS = []
-        headerQMS.append(['<<HEADER>>', len(self.mapsdetailsQMS)+6])
+        headerQMS.append(['<<HEADER>>', 7, self.mapName])
         headerQMS.append(self.templateQMS)
         headerQMS.extend(self.mapsdetailsQMS)
         headerQMS.append(self.consistentQMS)
         headerQMS.append(self.dynamicQMS)
         headerQMS.append(self.legendQMS)
         headerQMS.append(['<<END OF HEADER>>'])
+        self.headerLength = len(headerQMS)
+        headerQMS[0][1] = self.headerLength
 
         layersHeaderQMS = []
         layersHeaderQMS.extend(self.mapsQMS)
@@ -180,7 +182,15 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             writer.writerows(self.mapSheetsQMS)
 
     def returnValues(self):
-        return os.path.join(self.setupPath, self.setupName + ".QMapSetup")
+        returnQMS = []
+        returnQMS.append([self.headerLength, self.mapName])
+        returnQMS.append(self.templateQMS)
+        returnQMS.append(self.mapsdetailsQMS)
+        returnQMS.append(self.consistentQMS)
+        returnQMS.append(self.dynamicQMS)
+        returnQMS.append(self.legendQMS)
+        returnQMS.append(os.path.join(self.setupPath, self.setupName + ".QMapSetup"))
+        return returnQMS
 
 
     def dynamicLayersList(self):
@@ -197,6 +207,13 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.previewList.clear()
         for layer in layers:
             self.previewList.addItem(layer.name())
+
+    def loadQMS(self):
+        #Read QMS file
+        with open(QMSFile, newline='') as csvfile:
+            reader = list(csv.reader(csvfile, delimiter=','))
+            headerLength = reader[0][1]
+
 
     def deepSearch(self, layers, searchList):
         output = []
