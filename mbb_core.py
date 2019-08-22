@@ -22,15 +22,16 @@
  *                                                                         *
  ***************************************************************************/
 """
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 from qgis.core import *
+from qgis.gui import QgsLayoutDesignerInterface
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
-from .mbb_core_dialog import mbb_qgis_pluginDialog
+from .mbb_core_dockwidget import mbb_DockWidget
 import os
 import csv
 
@@ -65,10 +66,10 @@ class mbb_qgis_plugin:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Map Book Builder')
+        self.pluginIsActive = False
+        self.dockwidget = None
 
-        # Check if plugin was started the first time in current QGIS session
-        # Must be set in initGui() to survive plugin reloads
-        self.first_start = None
+        #self.run()
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -93,7 +94,7 @@ class mbb_qgis_plugin:
         callback,
         enabled_flag=True,
         add_to_menu=True,
-        add_to_toolbar=True,
+        add_to_toolbar=False,
         status_tip=None,
         whats_this=None,
         parent=None):
@@ -170,8 +171,22 @@ class mbb_qgis_plugin:
             callback=self.run,
             parent=self.iface.mainWindow())
 
-        # will be set False in run()
-        self.first_start = True
+    def onClosePlugin(self):
+        """Cleanup necessary items here when plugin dockwidget is closed"""
+
+        #print "** CLOSING mapbook"
+
+        # disconnects
+        self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
+
+        # remove this statement if dockwidget is to remain
+        # for reuse if plugin is reopened
+        # Commented next statement since it causes QGIS crashe
+        # when closing the docked window:
+        # self.dockwidget = None
+
+        self.pluginIsActive = False
+
 
 
     def unload(self):
@@ -184,13 +199,27 @@ class mbb_qgis_plugin:
 
 
     def run(self):
-        """Run method that performs all the real work"""
 
-        # Create the dialog with elements (after translation) and keep reference
-        # Only create GUI ONCE in callback, so that it will only load when the plugin is started
-        if self.first_start == True:
-            self.first_start = False
-            self.dlg = mbb_qgis_pluginDialog()
+        des = self.iface.openLayoutDesigners()
+        for de in des:
+            print(de)
+            de.addToolBar('test')
+        """Run method that performs all the real work"""
+        if not self.pluginIsActive:
+            self.pluginIsActive = True
+
+            # dockwidget may not exist if:
+            #    first run of plugin
+            #    removed on close (see self.onClosePlugin method)
+            if self.dockwidget == None:
+                # Create the dockwidget (after translation) and keep reference
+                self.dockwidget = mbb_DockWidget()
+
+            # connect to provide cleanup on closing of dockwidget
+            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+
+            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
+            self.dockwidget.show()
 
         #remove existing files
         layers = QgsProject.instance().mapLayersByName('MapBookBuilder')
@@ -198,10 +227,10 @@ class mbb_qgis_plugin:
             QgsProject.instance().removeMapLayer(layer.id())
 
 
-        # show the dialog
-        self.dlg.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        result = False
+        #result = self.dockwidget.exec_()
+
         # See if OK was pressed
         if result:
             # Do something useful here - delete the line containing pass and
@@ -212,35 +241,6 @@ class mbb_qgis_plugin:
             #Read in QMS as layer
             QMSLayer = self.iface.addVectorLayer("file:///" + returnQMS[6] + "?type=csv&skipLines="+ str(headerLength)+"&detectTypes=yes&xField=MainMap_X&yField=MainMap_Y&crs="+QgsProject.instance().crs().authid()+"&spatialIndex=no&subsetIndex=no&watchFile=no", "MapBookBuilder","delimitedtext")
 
-            #Initialize layout
-            manager = QgsProject.instance().layoutManager()
-            for layout in manager.printLayouts():
-                if layout.name() == returnQMS[0][1]:
-                    manager.removeLayout(layout)
-            layout = QgsPrintLayout(QgsProject.instance())
-            layout.initializeDefaults()
-            layout.setName(returnQMS[0][1])
-            manager.addLayout(layout)
-
-            #Set up atlas
-            atlas = layout.atlas()
-            atlas.setCoverageLayer(QMSLayer)
-            atlas.setEnabled(True)
-            atlas.setHideCoverage(True)
-
-            #Add maps
-            for map in returnQMS[2]:
-                layoutMap = QgsLayoutItemMap(layout)
-                layoutMap.setId("Map")
-                layoutMap.attemptMove(QgsLayoutPoint(10.0,10.0))
-                layoutMap.attemptResize(QgsLayoutSize(100,100))
-
-                layoutMap.setAtlasDriven(True)
-                layoutMap.setDataDefinedProperties(QgsLayoutObject::DataDefinedProperty)
-
-
-
-                layout.addItem(layoutMap)
-
+            #Edit map to show layers
 
             #Turn on atlas mode
