@@ -26,7 +26,7 @@
     <enum>QFrame::Box</enum>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="Setup">
     <widget class="QRadioButton" name="loadExisting">
@@ -175,57 +175,6 @@ p, li { white-space: pre-wrap; }
     </widget>
    </widget>
    <widget class="QWidget" name="Template">
-    <widget class="QTreeWidget" name="templates">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>300</y>
-       <width>256</width>
-       <height>192</height>
-      </rect>
-     </property>
-     <column>
-      <property name="text">
-       <string notr="true">1</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QgsOpacityWidget" name="mainOverlayT" native="true">
-     <property name="geometry">
-      <rect>
-       <x>360</x>
-       <y>250</y>
-       <width>160</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="opacity" stdset="0">
-      <double>0.500000000000000</double>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="mainOverlay">
-     <property name="geometry">
-      <rect>
-       <x>360</x>
-       <y>230</y>
-       <width>131</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Overlay Basemap</string>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="mainBasemap">
-     <property name="geometry">
-      <rect>
-       <x>152</x>
-       <y>250</y>
-       <width>201</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QLabel" name="title_label_3">
      <property name="geometry">
       <rect>
@@ -246,26 +195,66 @@ p, li { white-space: pre-wrap; }
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-   </widget>
-   <widget class="QWidget" name="Consistent">
-    <widget class="QLabel" name="title_label_4">
+    <widget class="QToolButton" name="existingTemplateBrowser">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>0</y>
-       <width>481</width>
-       <height>33</height>
+       <x>630</x>
+       <y>60</y>
+       <width>27</width>
+       <height>22</height>
       </rect>
      </property>
      <property name="text">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:16pt; font-weight:600;&quot;&gt;Setup Consistent Items&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>...</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </widget>
+    <widget class="QLineEdit" name="existingTemplate">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>611</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="layoutTemplate">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>161</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Layout Template</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="existingLayout">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>161</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Existing Project Layout</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="existingLayouts">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>641</width>
+       <height>22</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -764,6 +753,28 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
+   <widget class="QWidget" name="page">
+    <widget class="QLabel" name="title_label_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>481</width>
+       <height>33</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:16pt; font-weight:600;&quot;&gt;Review of map items&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QPushButton" name="nextButton">
    <property name="geometry">
@@ -837,13 +848,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QgsOpacityWidget</class>
-   <extends>QWidget</extends>
-   <header>qgsopacitywidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

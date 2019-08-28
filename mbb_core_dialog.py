@@ -28,6 +28,7 @@ import csv
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import *
 from .mbb_core_dialog_additem import mbb_dialog_additem
 
@@ -64,6 +65,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.eRemove.clicked.connect(lambda: self.removeDynamicItem(1))
         self.sRemove.clicked.connect(lambda: self.removeDynamicItem(2))
 
+        self.existingTemplateBrowser.clicked.connect(lambda: self.loadExistingFile(self.existingTemplate, 'QGIS Print Composer Template (*.qpt)'))
 
         self.sMoveUp.clicked.connect(lambda: self.createSearchList(self.tTree))
         self.sTree.clear()
@@ -115,7 +117,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         if i == 0:                          #Setup
             validEntry = self.setup()
         if i == 1:                          #Template
-            validEntry = self.setup()
+            validEntry = self.setupTemplate()
         if i == 2:                          #Consistent
             validEntry = self.setup()
         if i == 3:                          #Dynamic
@@ -149,6 +151,17 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Fetch the currently loaded layers
         self.layers = self.load_all_layers(QgsProject.instance().layerTreeRoot().children(), self.layers)
+
+        # Fetch the current project layouts
+        manager = QgsProject.instance().layoutManager()
+        if len(manager.printLayouts()) == 0:
+            self.existingLayout.setCheckable(False)
+            self.existingLayout.setChecked(False)
+        else:
+            self.existingLayouts.clear()
+            self.existingLayout.setCheckable(True)
+            for layout in manager.printLayouts():
+                self.existingLayouts.addItem(layout.name())
 
 
 
@@ -192,6 +205,51 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         returnQMS.append(os.path.join(self.setupPath, self.setupName + ".QMapSetup"))
         return returnQMS
 
+    def setupTemplate(self):
+        self.newLayout = self.layoutTemplate.isChecked()
+        if self.newLayout:
+            if os.path.exists(self.existingTemplate.text()):
+                self.template = QgsPrintLayout(QgsProject.instance())
+                with open(self.existingTemplate.text()) as f:
+                    template_content = f.read()
+                doc = QDomDocument()
+                doc.setContent(template_content)
+
+                # adding to existing items
+                self.template.loadFromTemplate(doc, QgsReadWriteContext())
+
+                #self.template.setName("TEST")
+                #manager = QgsProject.instance().layoutManager()
+                #manager.addLayout(self.template)
+
+            else:
+                #Give warning not able to load
+                print('No File')
+                return False
+        else:
+            manager = QgsProject.instance().layoutManager()
+            for layout in manager.printLayouts():
+                if layout.name() == self.existingLayouts.currentText():
+                    self.template = layout
+
+        #find maps in template
+        self.templateMaps = []
+        for i in self.template.items():
+            if isinstance(i, QgsLayoutItemMap):
+                self.templateMaps.append(i)
+
+        if len(self.templateMaps) == 0:
+            #Give warning no maps in template
+            print('No Maps')
+            return False
+        else:
+            print(self.templateMaps)
+            return True
+
+    def loadExistingFile(self, item, fileType):
+        file = QFileDialog.getOpenFileName(self,'Select File', '/home',fileType)
+        if file[0] is not '':
+            item.setText(file[0])
 
     def dynamicLayersList(self):
         layers = self.layers.copy()

@@ -212,35 +212,35 @@ class mbb_qgis_plugin:
             #Read in QMS as layer
             QMSLayer = self.iface.addVectorLayer("file:///" + returnQMS[6] + "?type=csv&skipLines="+ str(headerLength)+"&detectTypes=yes&xField=MainMap_X&yField=MainMap_Y&crs="+QgsProject.instance().crs().authid()+"&spatialIndex=no&subsetIndex=no&watchFile=no", "MapBookBuilder","delimitedtext")
 
-            #Initialize layout
-            manager = QgsProject.instance().layoutManager()
-            for layout in manager.printLayouts():
-                if layout.name() == returnQMS[0][1]:
-                    manager.removeLayout(layout)
-            layout = QgsPrintLayout(QgsProject.instance())
-            layout.initializeDefaults()
-            layout.setName(returnQMS[0][1])
-            manager.addLayout(layout)
-
-            #Set up atlas
-            atlas = layout.atlas()
-            atlas.setCoverageLayer(QMSLayer)
-            atlas.setEnabled(True)
-            atlas.setHideCoverage(True)
-
-            #Add maps
-            for map in returnQMS[2]:
-                layoutMap = QgsLayoutItemMap(layout)
-                layoutMap.setId("Map")
-                layoutMap.attemptMove(QgsLayoutPoint(10.0,10.0))
-                layoutMap.attemptResize(QgsLayoutSize(100,100))
-
-                layoutMap.setAtlasDriven(True)
-                layoutMap.setDataDefinedProperties(QgsLayoutObject::DataDefinedProperty)
-
-
-
-                layout.addItem(layoutMap)
-
-
-            #Turn on atlas mode
+            # #Initialize layout
+            # manager = QgsProject.instance().layoutManager()
+            # for layout in manager.printLayouts():
+            #     if layout.name() == returnQMS[0][1]:
+            #         manager.removeLayout(layout)
+            # layout = QgsPrintLayout(QgsProject.instance())
+            # layout.initializeDefaults()
+            # layout.setName(returnQMS[0][1])
+            # manager.addLayout(layout)
+            # 
+            # #Set up atlas
+            # atlas = layout.atlas()
+            # atlas.setCoverageLayer(QMSLayer)
+            # atlas.setEnabled(True)
+            # atlas.setHideCoverage(True)
+            #
+            # #Add maps
+            # for map in returnQMS[2]:
+            #     layoutMap = QgsLayoutItemMap(layout)
+            #     layoutMap.setId("Map")
+            #     layoutMap.attemptMove(QgsLayoutPoint(10.0,10.0))
+            #     layoutMap.attemptResize(QgsLayoutSize(100,100))
+            #
+            #     layoutMap.setAtlasDriven(True)
+            #     layoutMap.setDataDefinedProperties(QgsLayoutObject::DataDefinedProperty)
+            #
+            #
+            #
+            #     layout.addItem(layoutMap)
+            #
+            #
+            # #Turn on atlas mode
