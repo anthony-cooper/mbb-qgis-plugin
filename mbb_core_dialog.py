@@ -133,6 +133,10 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.update_buttons()   #update the buttons
             else:
                 self.writeSetupFile()
+                if self.newLayout: #Check if new layout and load if neccessary
+                    manager = QgsProject.instance().layoutManager()
+                    manager.addLayout(self.template)
+
                 self.accept()   #return to main run, do the generation
 
     def setup(self):
@@ -160,8 +164,10 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         else:
             self.existingLayouts.clear()
             self.existingLayout.setCheckable(True)
+            self.allLayoutNames = []
             for layout in manager.printLayouts():
-                self.existingLayouts.addItem(layout.name())
+                self.allLayoutNames.append(layout.name())
+            self.existingLayouts.addItems(self.allLayoutNames)
 
 
 
@@ -208,6 +214,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def setupTemplate(self):
         self.newLayout = self.layoutTemplate.isChecked()
         if self.newLayout:
+            if (self.newLayoutName.text() == '') or (self.newLayoutName.text() in self.allLayoutNames):
+                print('Invalid Layout Name')
+                return False
+
+
             if os.path.exists(self.existingTemplate.text()):
                 self.template = QgsPrintLayout(QgsProject.instance())
                 with open(self.existingTemplate.text()) as f:
@@ -218,7 +229,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 # adding to existing items
                 self.template.loadFromTemplate(doc, QgsReadWriteContext())
 
-                #self.template.setName("TEST")
+                self.template.setName(self.newLayoutName.text())
+
                 #manager = QgsProject.instance().layoutManager()
                 #manager.addLayout(self.template)
 
@@ -226,6 +238,9 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 #Give warning not able to load
                 print('No File')
                 return False
+
+
+
         else:
             manager = QgsProject.instance().layoutManager()
             for layout in manager.printLayouts():
