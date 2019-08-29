@@ -75,18 +75,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.otherItem = 'All (Other) Items'
 
         #defaults for setup file
-        self.templateQMS = ['TEMPLATE NAME', ]
-        self.mapsdetailsQMS = [['MAIN MAP'], ['SUPER MAP']]
-        self.consistentQMS = ['CONSISTENT ITEMS']
-        self.dynamicQMS = ['DYNAMIC ITEMS']
-        self.legendQMS = ['LEGEND DETAILS']
 
-        self.mapsQMS = []
-        self.mainMapQMS = ["MainMap_X", "MainMap_Y", "MainMap_Scale", "MainMap_Orientation", "MainMap_Layers"]
-        self.mapsQMS.extend(self.mainMapQMS)
-        self.otherItemsQMS = []
-
-        self.mapSheetsQMS = [[1,2,3,4,'TEST',6,7]]
 
         self.mapName = 'TEST'
 
@@ -119,11 +108,12 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         if name == 'Template':                                 #Template
             validEntry = self.setupTemplate()
         if name == 'Dynamic':                                  #Dynamic
-            validEntry = self.setup()
+            validEntry = self.dynamicLayersList()
         if name == 'DynamicDetails':                           #Dynamic details
+            validEntry = self.confirmDynamicDetails()
             validEntry = self.selectMapItems()
         if name == 'Maps':                                     #Maps
-            validEntry = self.setup()
+            validEntry = self.confirmMapItems()
 
 
 
@@ -169,28 +159,22 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             for layout in manager.printLayouts():
                 self.allLayoutNames.append(layout.name())
             self.existingLayouts.addItems(self.allLayoutNames)
-
-
-
         return True
 
     def writeSetupFile(self):
         #Prep header
         headerQMS = []
-        headerQMS.append(['<<HEADER>>', 7, self.mapName])
-        headerQMS.append(self.templateQMS)
-        headerQMS.extend(self.mapsdetailsQMS)
-        headerQMS.append(self.consistentQMS)
-        headerQMS.append(self.dynamicQMS)
-        headerQMS.append(self.legendQMS)
+        headerQMS.append(['<<HEADER>>', 3])
+        headerQMS.extend(self.mapsDetailsQMS)
         headerQMS.append(['<<END OF HEADER>>'])
         self.headerLength = len(headerQMS)
         headerQMS[0][1] = self.headerLength
 
         layersHeaderQMS = []
-        layersHeaderQMS.extend(self.mapsQMS)
-        layersHeaderQMS.extend(self.otherItemsQMS)
+        layersHeaderQMS.extend(self.itemsHeaderQMS)
+        layersHeaderQMS.extend(self.mapsHeaderQMS)
 
+        self.generateSheetsList()
 
         if os.path.exists(os.path.join(self.setupPath, self.setupName + ".QMapSetup")):
             os.remove(os.path.join(self.setupPath, self.setupName + ".QMapSetup"))
@@ -201,9 +185,20 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             writer.writerow(layersHeaderQMS)
             writer.writerows(self.mapSheetsQMS)
 
+    def generateSheetsList(self):
+        self.mapSheetsQMS = []
+        #for location in locations:
+        for layer in self.dynamicLayers:
+            details = [123,456,layer.name(), 'Dynamic Layer']
+            for map in self.templateMaps:
+                details.extend([25000, 15, 'layer'+'|'+'dylayer'])
+            self.mapSheetsQMS.append(details)
+
+
+
     def returnValues(self):
 
-        return self.headerLength, os.path.join(self.setupPath, self.setupName + ".QMapSetup")
+        return self.headerLength, os.path.join(self.setupPath, self.setupName + ".QMapSetup"), self.template, self.templateMaps
 
     def setupTemplate(self):
         self.newLayout = self.layoutTemplate.isChecked()
@@ -261,6 +256,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             item.setText(file[0])
 
     def dynamicLayersList(self):
+        self.dynamicLayers = []
         layers = self.layers.copy()
         searchLists = [[],[],[]]
         searchLists[0] = self.createSearchList(self.tTree)
@@ -274,6 +270,16 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.previewList.clear()
         for layer in layers:
             self.previewList.addItem(layer.name())
+
+        self.dynamicLayers = layers
+        if len(self.dynamicLayers) > 0:
+            return True
+        else:
+            print('No Layers')
+
+    def confirmDynamicDetails(self):
+        self.itemsHeaderQMS = []
+        self.itemsHeaderQMS.extend(['easting', 'northing', 'dynamicLayer', 'pageName'])
 
     def loadQMS(self):
         #Read QMS file
@@ -289,6 +295,15 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             print(mapItem.displayName())
             self.mapItems.insertTab(self.mapItems.count(), tabLayout, mapItem.displayName())
 
+        return True
+
+    def confirmMapItems(self):
+        self.mapsHeaderQMS = []
+        self.mapsDetailsQMS = []
+
+        for map in self.templateMaps:
+            self.mapsHeaderQMS.extend([map.displayName() + '_Scale',  map.displayName() + '_Rotation', map.displayName() + '_Layers'])
+            self.mapsDetailsQMS.append([map.displayName])
         return True
 
     def deepSearch(self, layers, searchList):

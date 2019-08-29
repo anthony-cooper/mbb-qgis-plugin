@@ -26,7 +26,7 @@
     <enum>QFrame::Box</enum>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="Setup">
     <widget class="QRadioButton" name="loadExisting">
@@ -231,7 +231,7 @@ p, li { white-space: pre-wrap; }
       <string>Layout Template</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QRadioButton" name="existingLayout">
@@ -245,6 +245,9 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="text">
       <string>Existing Project Layout</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QComboBox" name="existingLayouts">
@@ -754,7 +757,7 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="Review">
+   <widget class="QWidget" name="DynamicDetails">
     <widget class="QLabel" name="title_label_6">
      <property name="geometry">
       <rect>
@@ -776,7 +779,7 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="page">
+   <widget class="QWidget" name="Maps">
     <widget class="QLabel" name="title_label_7">
      <property name="geometry">
       <rect>
