@@ -109,20 +109,20 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.update_buttons()
 
     def __next__(self):
+        name = (self.stackedWidget.currentWidget()).objectName()
         i = self.stackedWidget.currentIndex()
-
         validEntry = True
 
         #Check valid entry for sheet #, and prep next sheet
-        if i == 0:                          #Setup
+        if name == 'Setup':                                    #Setup
             validEntry = self.setup()
-        if i == 1:                          #Template
+        if name == 'Template':                                 #Template
             validEntry = self.setupTemplate()
-        if i == 2:                          #Consistent
+        if name == 'Dynamic':                                  #Dynamic
             validEntry = self.setup()
-        if i == 3:                          #Dynamic
-            validEntry = self.setup()
-        if i == 4:                          #Review
+        if name == 'DynamicDetails':                           #Dynamic details
+            validEntry = self.selectMapItems()
+        if name == 'Maps':                                     #Maps
             validEntry = self.setup()
 
 
@@ -158,13 +158,14 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Fetch the current project layouts
         manager = QgsProject.instance().layoutManager()
+        self.allLayoutNames = []
+
         if len(manager.printLayouts()) == 0:
             self.existingLayout.setCheckable(False)
             self.existingLayout.setChecked(False)
         else:
             self.existingLayouts.clear()
             self.existingLayout.setCheckable(True)
-            self.allLayoutNames = []
             for layout in manager.printLayouts():
                 self.allLayoutNames.append(layout.name())
             self.existingLayouts.addItems(self.allLayoutNames)
@@ -258,7 +259,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             print('No Maps')
             return False
         else:
-            print(self.templateMaps)
+            #print(self.templateMaps)
             return True
 
     def loadExistingFile(self, item, fileType):
@@ -287,6 +288,15 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             reader = list(csv.reader(csvfile, delimiter=','))
             headerLength = reader[0][1]
 
+    def selectMapItems(self):
+        for i in range(0, self.mapItems.count()  - 1):
+            self.mapItems.removeTab(i)
+        for mapItem in self.templateMaps:
+            tabLayout = QWidget()
+            print(mapItem.displayName())
+            self.mapItems.insertTab(self.mapItems.count(), tabLayout, mapItem.displayName())
+
+        return True
 
     def deepSearch(self, layers, searchList):
         output = []
