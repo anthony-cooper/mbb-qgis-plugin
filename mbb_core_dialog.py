@@ -202,15 +202,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             writer.writerows(self.mapSheetsQMS)
 
     def returnValues(self):
-        returnQMS = []
-        returnQMS.append([self.headerLength, self.mapName])
-        returnQMS.append(self.templateQMS)
-        returnQMS.append(self.mapsdetailsQMS)
-        returnQMS.append(self.consistentQMS)
-        returnQMS.append(self.dynamicQMS)
-        returnQMS.append(self.legendQMS)
-        returnQMS.append(os.path.join(self.setupPath, self.setupName + ".QMapSetup"))
-        return returnQMS
+
+        return self.headerLength, os.path.join(self.setupPath, self.setupName + ".QMapSetup")
 
     def setupTemplate(self):
         self.newLayout = self.layoutTemplate.isChecked()

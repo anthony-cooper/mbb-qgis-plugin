@@ -206,11 +206,11 @@ class mbb_qgis_plugin:
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            returnQMS = self.dlg.returnValues()
-            headerLength = returnQMS[0][0]
+            headerLength, QMSFile = self.dlg.returnValues()
+
 
             #Read in QMS as layer
-            QMSLayer = self.iface.addVectorLayer("file:///" + returnQMS[6] + "?type=csv&skipLines="+ str(headerLength)+"&detectTypes=yes&xField=MainMap_X&yField=MainMap_Y&crs="+QgsProject.instance().crs().authid()+"&spatialIndex=no&subsetIndex=no&watchFile=no", "MapBookBuilder","delimitedtext")
+            QMSLayer = self.iface.addVectorLayer("file:///" + QMSFile + "?type=csv&skipLines="+ str(headerLength)+"&detectTypes=yes&xField=MainMap_X&yField=MainMap_Y&crs="+QgsProject.instance().crs().authid()+"&spatialIndex=no&subsetIndex=no&watchFile=no", "MapBookBuilder","delimitedtext")
 
             # #Initialize layout
             # manager = QgsProject.instance().layoutManager()
@@ -221,7 +221,7 @@ class mbb_qgis_plugin:
             # layout.initializeDefaults()
             # layout.setName(returnQMS[0][1])
             # manager.addLayout(layout)
-            # 
+            #
             # #Set up atlas
             # atlas = layout.atlas()
             # atlas.setCoverageLayer(QMSLayer)
