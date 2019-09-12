@@ -206,21 +206,11 @@ class mbb_qgis_plugin:
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            returnQMS = self.dlg.returnValues()
-            headerLength = returnQMS[0][0]
+            headerLength, QMSFile, layout, layoutMaps = self.dlg.returnValues()
+
 
             #Read in QMS as layer
-            QMSLayer = self.iface.addVectorLayer("file:///" + returnQMS[6] + "?type=csv&skipLines="+ str(headerLength)+"&detectTypes=yes&xField=MainMap_X&yField=MainMap_Y&crs="+QgsProject.instance().crs().authid()+"&spatialIndex=no&subsetIndex=no&watchFile=no", "MapBookBuilder","delimitedtext")
-
-            #Initialize layout
-            manager = QgsProject.instance().layoutManager()
-            for layout in manager.printLayouts():
-                if layout.name() == returnQMS[0][1]:
-                    manager.removeLayout(layout)
-            layout = QgsPrintLayout(QgsProject.instance())
-            layout.initializeDefaults()
-            layout.setName(returnQMS[0][1])
-            manager.addLayout(layout)
+            QMSLayer = self.iface.addVectorLayer("file:///" + QMSFile + "?type=csv&skipLines="+ str(headerLength)+"&detectTypes=yes&xField=easting&yField=northing&crs="+QgsProject.instance().crs().authid()+"&spatialIndex=no&subsetIndex=no&watchFile=no", "MapBookBuilder","delimitedtext")
 
             #Set up atlas
             atlas = layout.atlas()
@@ -228,19 +218,11 @@ class mbb_qgis_plugin:
             atlas.setEnabled(True)
             atlas.setHideCoverage(True)
 
-            #Add maps
-            for map in returnQMS[2]:
-                layoutMap = QgsLayoutItemMap(layout)
-                layoutMap.setId("Map")
-                layoutMap.attemptMove(QgsLayoutPoint(10.0,10.0))
-                layoutMap.attemptResize(QgsLayoutSize(100,100))
 
-                layoutMap.setAtlasDriven(True)
-                layoutMap.setDataDefinedProperties(QgsLayoutObject::DataDefinedProperty)
-
-
-
-                layout.addItem(layoutMap)
-
+            #edit maps
+            for map in layoutMaps:
+                map.setFrameEnabled(True)
 
             #Turn on atlas mode
+
+            self.iface.openLayoutDesigner(layout)
