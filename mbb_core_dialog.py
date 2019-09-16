@@ -148,7 +148,12 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.layers = []
 
         # Fetch the currently loaded layers
-        self.layers = self.load_all_layers(QgsProject.instance().layerTreeRoot().children(), self.layers)
+        #self.layers = self.load_all_layers(QgsProject.instance().layerTreeRoot().children(), self.layers)
+        lyrs = QgsProject.instance().mapLayers()
+        for layer_id, layer in lyrs.items():
+            self.layers.append([layer,[]])
+
+
 
         # Fetch the current project layouts
         manager = QgsProject.instance().layoutManager()
@@ -378,10 +383,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             layers = self.deepSearch(layers,searchList)
 
 
-        self.previewList.clear()
+        self.previewTree.clear()
         for layer in layers:
-            self.previewList.addItem(layer.name())
-
+            #print(layer)
+            twi = QTreeWidgetItem(self.previewTree,[layer[0].name()],0)
+            print(layer[1])
         self.dynamicLayers = layers
         if len(self.dynamicLayers) > 0:
             return True
@@ -481,6 +487,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
     def deepSearch(self, layers, searchList):
+        #print(layers)
+        #print(searchList)
         output = []
         for search in searchList:
             research = []
@@ -493,17 +501,17 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                     if (search[0] == '') and (len(searchList) > 1):
                         negSearch = searchList.copy()
                         negSearch.remove(search)
-                        if any(x[0] not in layer.name() for x in negSearch):
-                            output.append(layer)
+                        if any(x[0] not in layer[0].name() for x in negSearch):
+                            output.append([layer[0],[search]])
                             found.append(layer)
                     else:
-                        if search[0] in layer.name():
+                        if search[0] in layer[0].name():
                             research.append(layer)
                             found.append(layer)
                 for layer in found:
                     layers.remove(layer)
                 for item in self.deepSearch(research, search[1]):
-                    output.append(item)
+                    output.append([item[0], [search[1]]])
             else:
 
                 for layer in layers:
@@ -512,18 +520,18 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                     if (search == '') and (len(searchList) > 1):
                         negSearch = searchList.copy()
                         negSearch.remove(search)
-                        if any(x not in layer.name() for x in negSearch):
-                            output.append(layer)
+                        if any(x not in layer[0].name() for x in negSearch):
+                            output.append([layer[0], [search]])
                             found.append(layer)
                     else:
-                        if search in layer.name():
-                            output.append(layer)
+                        if search in layer[0].name():
+                            output.append([layer[0], [search]])
                             found.append(layer)
                 for layer in found:
                     layers.remove(layer)
 
 
-
+        #print(output)
         return output
 
     def createSearchList(self, treeWidget):
@@ -557,7 +565,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def load_all_layers(self, group, layers):
         for child in group:
             if isinstance(child, QgsLayerTreeLayer):
-                layers.append(child)
+                layers.append(child,[])
             elif isinstance(child, QgsLayerTreeGroup):
                 layers = self.load_all_layers(child.children(), layers)
         return layers
