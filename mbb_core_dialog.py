@@ -202,8 +202,13 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             tabTree = QTreeWidget()
             #print(tabTree)
             tabLayout = QVBoxLayout()
+
             tabLayout.addWidget(tabTree)
             tabLayout.setSizeConstraint(QLayout.SetFixedSize)
+            tabTree.setFixedWidth(810)
+            tabTree.setFixedHeight(300)
+            tabTree.setColumnCount(2)
+            tabTree.setHeaderLabels(['Search Text', 'Written Text'])
             tab.setLayout(tabLayout)
             self.criteriaTabs.insertTab(self.criteriaTabs.count(), tab, criteria)
             #print(tab.children())
@@ -229,6 +234,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         result = self.additem_dlg.exec_()
         if result:
             item = self.additem_dlg.coreText.text()
+            alt = self.additem_dlg.altText.text()
             tab = self.criteriaTabs.currentWidget()
             # print(tab)
             # tabLayout = tab.layout()
@@ -236,13 +242,13 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             treeWidget = tab.children()[1]
             #print(treeWidget)
             if len(treeWidget.selectedItems()) == 0:#item not selected:
-                twi = QTreeWidgetItem(treeWidget,[item],0)
-                twi.addChild(QTreeWidgetItem([self.otherItem],0))
+                twi = QTreeWidgetItem(treeWidget,[item, alt],0)
+                twi.addChild(QTreeWidgetItem([self.otherItem, alt],0))
                 treeWidget.expandItem(twi)
             else: #item selected:
                 twi = treeWidget.currentItem()
-                twi = QTreeWidgetItem(twi,[item],0)
-                twi.addChild(QTreeWidgetItem([self.otherItem],0))
+                twi = QTreeWidgetItem(twi,[item, alt],0)
+                twi.addChild(QTreeWidgetItem([self.otherItem, alt],0))
                 treeWidget.expandItem(twi)
 
 
