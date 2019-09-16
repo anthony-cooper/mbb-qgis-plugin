@@ -31,6 +31,7 @@ from qgis.PyQt.QtWidgets import *
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import *
 from .mbb_core_dialog_additem import mbb_dialog_additem
+from .mbb_core_dialog_addmap import mbb_dialog_addmap
 
 
 
@@ -64,6 +65,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.removeProperty.clicked.connect(lambda: self.removePropertyItem())
         self.upCriteria.clicked.connect(lambda: self.moveUpCriteriaTab())
         self.upProperty.clicked.connect(lambda: self.moveUpPropertyItem())
+
+        self.addMap.clicked.connect(lambda: self.addMapItem())
+        self.removeMap.clicked.connect(lambda: self.removeMapItem())
+        self.upMap.clicked.connect(lambda: self.moveUpMapItem())
+
 
         self.existingTemplateBrowser.clicked.connect(lambda: self.loadExistingFile(self.existingTemplate, 'QGIS Print Composer Template (*.qpt)'))
 
@@ -395,12 +401,74 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def selectMapItems(self):
         for i in range(0, self.mapItems.count()  - 1):
             self.mapItems.removeTab(i)
+
         for mapItem in self.templateMaps:
-            tabLayout = QWidget()
-            print(mapItem.displayName())
-            self.mapItems.insertTab(self.mapItems.count(), tabLayout, mapItem.displayName())
+            tab = QWidget()
+            tabTree = QTreeWidget()
+            tabLayout = QVBoxLayout()
+            tabLayout.addWidget(tabTree)
+            tabLayout.setSizeConstraint(QLayout.SetFixedSize)
+            tabTree.setFixedWidth(810)
+            tabTree.setFixedHeight(550)
+            tabTree.setColumnCount(2)
+            tabTree.setHeaderLabels(['Layer Name', 'Included in Legend'])
+            tab.setLayout(tabLayout)
+            self.mapItems.insertTab(self.mapItems.count(), tab, mapItem.displayName())
+
 
         return True
+
+    def addMapItem(self):
+        self.addmap_dlg = mbb_dialog_addmap()
+        layerList = self.addmap_dlg.layerList
+        layers = QgsProject.instance().mapLayers()
+        layerList.clear()
+        layerList.addItem('<><> LEAD DYNAMIC LAYER <><>')
+        for layer_id, layer in layers.items():
+            layerList.addItem(layer.name())
+
+
+
+        self.addmap_dlg.show()
+        result = self.addmap_dlg.exec_()
+        if result:
+            tab = self.mapItems.currentWidget()
+            treeWidget = tab.children()[1]
+            for layer in layerList.selectedItems():
+                item = layer.text()
+                twi = QTreeWidgetItem(treeWidget,[item],0)
+
+
+    def removeMapItem(self):
+        tab = self.mapItems.currentWidget()
+        tw = tab.children()[1]
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx != -1:
+                tw.takeTopLevelItem(idx)
+            else:
+                twi = item.parent()
+                idx = twi.indexOfChild(item)
+                twi.takeChild(idx)
+
+    def moveUpMapItem(self):
+        tab = self.mapItems.currentWidget()
+        tw = tab.children()[1]
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx != -1:
+                if idx > 0:
+                    item = tw.takeTopLevelItem(idx)
+                    tw.insertTopLevelItem(idx - 1, item)
+            else:
+                twi = item.parent()
+                idx = twi.indexOfChild(item)
+                if idx > 0:
+                    item = twi.takeChild(idx)
+                    twi.insertChild(idx - 1, item)
+
 
     def confirmMapItems(self):
         self.mapsHeaderQMS = []
@@ -410,6 +478,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.mapsHeaderQMS.extend([map.displayName() + '_Scale',  map.displayName() + '_Rotation', map.displayName() + '_Layers'])
             self.mapsDetailsQMS.append([map.displayName])
         return True
+
 
     def deepSearch(self, layers, searchList):
         output = []
@@ -456,7 +525,6 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
         return output
-
 
     def createSearchList(self, treeWidget):
         items = []
