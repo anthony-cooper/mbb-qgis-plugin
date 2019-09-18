@@ -442,6 +442,19 @@ p, li { white-space: pre-wrap; }
       </property>
      </column>
     </widget>
+    <widget class="QPushButton" name="deselProperty">
+     <property name="geometry">
+      <rect>
+       <x>730</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Deselect Property</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="DynamicDetails">
     <widget class="QLabel" name="title_label_6">

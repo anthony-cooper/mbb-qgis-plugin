@@ -65,6 +65,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.removeProperty.clicked.connect(lambda: self.removePropertyItem())
         self.upCriteria.clicked.connect(lambda: self.moveUpCriteriaTab())
         self.upProperty.clicked.connect(lambda: self.moveUpPropertyItem())
+        self.deselProperty.clicked.connect(lambda: self.deselectProperty())
+
 
         self.addMap.clicked.connect(lambda: self.addMapItem())
         self.removeMap.clicked.connect(lambda: self.removeMapItem())
@@ -301,6 +303,12 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.dynamicLayersList()
 
+    def deselectProperty(self):
+        tab = self.criteriaTabs.currentWidget()
+        tw = tab.children()[1]
+
+        tw.clearSelection()
+
 
     def returnValues(self):
 
@@ -387,7 +395,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         for layer in layers:
             #print(layer)
             twi = QTreeWidgetItem(self.previewTree,[layer[0].name()],0)
-            print(layer[1])
+            #print(layer[1])
         self.dynamicLayers = layers
         if len(self.dynamicLayers) > 0:
             return True
@@ -491,46 +499,52 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         #print(searchList)
         output = []
         for search in searchList:
+
             research = []
             found = []
             if type(search) == list:
+                #print('500')
+                #print(search)
+
                 for layer in layers:
 
                     #if search[0] == self.otherItem:
                     #    search[0] = ''
-                    if (search[0] == self.otherItem) and (len(searchList) > 1):
+                    if (search[0][0] == self.otherItem) and (len(searchList) > 1):
                         negSearch = searchList.copy()
                         negSearch.remove(search)
-                        if any(x[0] not in layer[0].name() for x in negSearch):
-                            output.append([layer[0],[search]])
+                        if any(x[0][0] not in layer[0].name() for x in negSearch):
+                            output.append([layer[0],[search[0]]])
                             found.append(layer)
                     else:
-                        if search == self.otherItem:
-                            search = ''
-                        if search[0] in layer[0].name():
+                        if search[0] == self.otherItem:
+                            search = ('',search[1])
+                        if search[0][0] in layer[0].name():
                             research.append(layer)
                             found.append(layer)
                 for layer in found:
                     layers.remove(layer)
                 for item in self.deepSearch(research, search[1]):
-                    output.append([item[0], [search[1]]])
+                    output.append([item[0], [search[1][0]]])
             else:
+                #print('520')
+                #print(search)
 
                 for layer in layers:
-                    if (search == self.otherItem) and (len(searchList) > 1):
+                    if (search[0] == self.otherItem) and (len(searchList) > 1):
                         negSearch = searchList.copy()
-                        print(negSearch)
-                        print(search)
+                        #print(negSearch)
+                        #print(search)
                         negSearch.remove(search)
-                        print(negSearch)
-                        if any(x not in layer[0].name() for x in negSearch):
-                            output.append([layer[0], [search]])
+                        #print(negSearch)
+                        if any(x[0] not in layer[0].name() for x in negSearch):
+                            output.append([layer[0], [search[0]]])
                             found.append(layer)
                     else:
-                        if search == self.otherItem:
-                            search = ''
-                        if search in layer[0].name():
-                            output.append([layer[0], [search]])
+                        if search[0] == self.otherItem:
+                            search = ('',search[1])
+                        if search[0] in layer[0].name():
+                            output.append([layer[0], [search[0]]])
                             found.append(layer)
                 for layer in found:
                     layers.remove(layer)
@@ -558,12 +572,12 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                         items.append(item.child(idx))
                     rList = self.createSearchLists(items)
                 else:
-                    rList = ['']
+                    rList = [('','')]
 
-                searchList.append([item.text(0), rList])
+                searchList.append([(item.text(0), item.text(1)), rList])
         else:
             for item in levelItems:
-                searchList.append(item.text(0))
+                searchList.append((item.text(0), item.text(1)))
 
         return searchList
 
