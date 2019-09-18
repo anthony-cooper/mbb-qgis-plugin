@@ -496,15 +496,17 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if type(search) == list:
                 for layer in layers:
 
-                    if search[0] == self.otherItem:
-                        search[0] = ''
-                    if (search[0] == '') and (len(searchList) > 1):
+                    #if search[0] == self.otherItem:
+                    #    search[0] = ''
+                    if (search[0] == self.otherItem) and (len(searchList) > 1):
                         negSearch = searchList.copy()
                         negSearch.remove(search)
                         if any(x[0] not in layer[0].name() for x in negSearch):
                             output.append([layer[0],[search]])
                             found.append(layer)
                     else:
+                        if search == self.otherItem:
+                            search = ''
                         if search[0] in layer[0].name():
                             research.append(layer)
                             found.append(layer)
@@ -515,15 +517,18 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             else:
 
                 for layer in layers:
-                    if search == self.otherItem:
-                        search = ''
-                    if (search == '') and (len(searchList) > 1):
+                    if (search == self.otherItem) and (len(searchList) > 1):
                         negSearch = searchList.copy()
+                        print(negSearch)
+                        print(search)
                         negSearch.remove(search)
+                        print(negSearch)
                         if any(x not in layer[0].name() for x in negSearch):
                             output.append([layer[0], [search]])
                             found.append(layer)
                     else:
+                        if search == self.otherItem:
+                            search = ''
                         if search in layer[0].name():
                             output.append([layer[0], [search]])
                             found.append(layer)
