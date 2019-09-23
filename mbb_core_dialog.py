@@ -181,11 +181,17 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.headerLength = len(headerQMS)
         headerQMS[0][1] = self.headerLength
 
-        layersHeaderQMS = []
-        layersHeaderQMS.extend(self.itemsHeaderQMS)
-        layersHeaderQMS.extend(self.mapsHeaderQMS)
+        mapDetailsHeader = ['MAP','easting','northing']
+        mapDetails = ['MAP',0,0]
 
-        self.generateSheetsList()
+        layersHeaderQMS = []
+        layersHeaderQMS.extend(mapDetailsHeader)
+        layersHeaderQMS.append('Lead Dynamic Layer')
+        for i in range(0, self.criteriaTabs.count()):
+            layersHeaderQMS.append(self.criteriaTabs.tabText(i))
+        for i in range(0, self.mapItems.count()):
+            layersHeaderQMS.append(self.mapItems.tabText(i) + '_Layers')
+
 
         if os.path.exists(os.path.join(self.setupPath, self.setupName + ".QMapSetup")):
             os.remove(os.path.join(self.setupPath, self.setupName + ".QMapSetup"))
@@ -194,16 +200,37 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             writer = csv.writer(file)
             writer.writerows(headerQMS)
             writer.writerow(layersHeaderQMS)
-            writer.writerows(self.mapSheetsQMS)
 
-    def generateSheetsList(self):
-        self.mapSheetsQMS = []
-        #for location in locations:
-        for layer in self.dynamicLayers:
-            details = [123,456,layer.name(), 'Dynamic Layer']
-            for map in self.templateMaps:
-                details.extend([25000, 15, 'layer'+'|'+'dylayer'])
-            self.mapSheetsQMS.append(details)
+
+            iterator = QTreeWidgetItemIterator(self.previewTree)
+            while iterator.value():
+                item = iterator.value()
+                layerRow = []
+                layerRow.extend(mapDetails)
+                for i in range(0, item.columnCount()):
+                    layerRow.append(item.text(i))
+
+                for i in range(0, self.mapItems.count()):
+                    tab = self.mapItems.widget(i)
+                    treeWidget = tab.children()[1]
+                    mapIterator = QTreeWidgetItemIterator(treeWidget)
+                    mapLayers = []
+                    while mapIterator.value():
+                        mapItem = mapIterator.value()
+                        if mapItem.text(0) == '<><> LEAD DYNAMIC LAYER <><>':
+                            mapLayers.append(item.text(0))
+                        else:
+                            mapLayers.append(mapItem.text(0))
+                        mapIterator += 1
+                    layerRow.append('|'.join(mapLayers))
+
+
+
+
+
+                writer.writerow(layerRow)
+                iterator += 1
+
 
     def addCriteriaTab(self):
         self.additem_dlg = mbb_dialog_additem()
@@ -377,16 +404,19 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         for lyr in lyrs:
             lyr[1]=[]
         searchLists = []
+        headerLabels=['Lead Dynamic Layer']
         for i in range(0, self.criteriaTabs.count()):
-            self.mapItems.removeTab(i)
             tab = self.criteriaTabs.widget(i)
             treeWidget = tab.children()[1]
             searchList = self.createSearchList(treeWidget)
-
+            headerLabels.append(self.criteriaTabs.tabText(i))
             lyrs = self.deepSearch(lyrs,searchList)
 
 
         self.previewTree.clear()
+        self.previewTree.setColumnCount(0)
+        self.previewTree.setHeaderLabels(headerLabels)
+
         for layer in lyrs:
             #print(layer)
             cols = []

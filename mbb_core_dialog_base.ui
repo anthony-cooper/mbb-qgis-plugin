@@ -425,13 +425,13 @@ p, li { white-space: pre-wrap; }
       <enum>QAbstractItemView::NoSelection</enum>
      </property>
      <property name="headerHidden">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="columnCount">
       <number>4</number>
      </property>
      <attribute name="headerVisible">
-      <bool>false</bool>
+      <bool>true</bool>
      </attribute>
      <attribute name="headerDefaultSectionSize">
       <number>500</number>
