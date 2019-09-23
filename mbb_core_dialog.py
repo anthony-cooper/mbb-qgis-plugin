@@ -389,7 +389,10 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.previewTree.clear()
         for layer in lyrs:
             #print(layer)
-            twi = QTreeWidgetItem(self.previewTree,[layer[0].name(), layer(1)],0)
+            cols = []
+            cols.append(layer[0].name())
+            cols.extend(layer[1])
+            twi = QTreeWidgetItem(self.previewTree,cols,0)
             #print(layer[1])
         self.dynamicLayers = lyrs
         if len(self.dynamicLayers) > 0:
