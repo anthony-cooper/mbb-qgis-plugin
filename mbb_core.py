@@ -222,6 +222,14 @@ class mbb_qgis_plugin:
             #edit maps
             for map in layoutMaps:
                 map.setFrameEnabled(True)
+                #map.setAtlasDriven()
+                #map.setAtlasMargin()
+                #map.setAtlasScalingMode()
+                #map.setExtent()
+
+                property = QgsProperty.fromField(map.displayName()+'_Layers')
+                map.dataDefinedProperties().setProperty(QgsLayoutObject.MapLayers,property)
+
 
             #Turn on atlas mode
 
