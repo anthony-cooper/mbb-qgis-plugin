@@ -19,7 +19,7 @@
      <x>10</x>
      <y>40</y>
      <width>851</width>
-     <height>671</height>
+     <height>511</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -305,19 +305,6 @@ p, li { white-space: pre-wrap; }
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>500</y>
-       <width>311</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Lead Dynamic Layer Preview</string>
-     </property>
-    </widget>
     <widget class="QTabWidget" name="criteriaTabs">
      <property name="geometry">
       <rect>
@@ -409,54 +396,6 @@ p, li { white-space: pre-wrap; }
       <string>Move Property Up</string>
      </property>
     </widget>
-    <widget class="QTreeWidget" name="previewTree">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>520</y>
-       <width>831</width>
-       <height>141</height>
-      </rect>
-     </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
-     </property>
-     <property name="headerHidden">
-      <bool>false</bool>
-     </property>
-     <property name="columnCount">
-      <number>4</number>
-     </property>
-     <attribute name="headerVisible">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="headerDefaultSectionSize">
-      <number>500</number>
-     </attribute>
-     <column>
-      <property name="text">
-       <string notr="true">1</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">2</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">3</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">4</string>
-      </property>
-     </column>
-    </widget>
     <widget class="QPushButton" name="deselProperty">
      <property name="geometry">
       <rect>
@@ -486,10 +425,127 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:16pt; font-weight:600;&quot;&gt;Review of Maps to be created&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:16pt; font-weight:600;&quot;&gt;Setup secondary dynamic layers&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDLI">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>480</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add Item</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDLC">
+     <property name="geometry">
+      <rect>
+       <x>580</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add condition</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeSDL">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>480</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove SDL</string>
+     </property>
+    </widget>
+    <widget class="QTabWidget" name="SDLItems">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>831</width>
+       <height>421</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeSDLI">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>480</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove Item</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDLP">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>480</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add Property</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDLExistingP">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add Existing Prop</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDL">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>480</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add SDL</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeSDLF">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove thing</string>
      </property>
     </widget>
    </widget>
@@ -518,9 +574,9 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
+       <y>50</y>
        <width>831</width>
-       <height>591</height>
+       <height>421</height>
       </rect>
      </property>
      <property name="currentIndex">
@@ -531,7 +587,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>640</y>
+       <y>480</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -544,7 +600,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>640</y>
+       <y>480</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -557,7 +613,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>330</x>
-       <y>640</y>
+       <y>480</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -570,7 +626,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>490</x>
-       <y>640</y>
+       <y>480</y>
        <width>151</width>
        <height>21</height>
       </rect>
@@ -650,6 +706,47 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QTreeWidget" name="previewTree">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>570</y>
+     <width>851</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="alternatingRowColors">
+    <bool>true</bool>
+   </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::NoSelection</enum>
+   </property>
+   <property name="headerHidden">
+    <bool>false</bool>
+   </property>
+   <property name="columnCount">
+    <number>0</number>
+   </property>
+   <attribute name="headerVisible">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="headerDefaultSectionSize">
+    <number>500</number>
+   </attribute>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>550</y>
+     <width>311</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Lead Dynamic Layer Preview</string>
    </property>
   </widget>
  </widget>

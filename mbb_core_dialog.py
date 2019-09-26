@@ -32,6 +32,7 @@ from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import *
 from .mbb_core_dialog_additem import mbb_dialog_additem
 from .mbb_core_dialog_addmap import mbb_dialog_addmap
+from .mbb_core_dialog_addproperty import mbb_dialog_addproperty
 
 
 
@@ -66,6 +67,16 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.upCriteria.clicked.connect(lambda: self.moveUpCriteriaTab())
         self.upProperty.clicked.connect(lambda: self.moveUpPropertyItem())
         self.deselProperty.clicked.connect(lambda: self.deselectProperty())
+
+        self.addSDL.clicked.connect(lambda: self.addSDLTab())
+        self.addSDLC.clicked.connect(lambda: self.addSDLCriteria())
+        self.addSDLExistingP.clicked.connect(lambda: self.addSDLExistingProperty())
+        self.addSDLI.clicked.connect(lambda: self.addSDLItem())
+        self.addSDLP.clicked.connect(lambda: self.addSDLProperty())
+        self.removeSDL.clicked.connect(lambda: self.removeSDLTab())
+        self.removeSDLI.clicked.connect(lambda: self.removeSDLItem())
+        self.removeSDLF.clicked.connect(lambda: self.removeSDLFeature())
+
 
 
         self.addMap.clicked.connect(lambda: self.addMapItem())
@@ -231,7 +242,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 writer.writerow(layerRow)
                 iterator += 1
 
-
+#Lead Dynamic Layers
     def addCriteriaTab(self):
         self.additem_dlg = mbb_dialog_additem()
         self.additem_dlg.show()
@@ -274,7 +285,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         result = self.additem_dlg.exec_()
         if result:
             item = self.additem_dlg.coreText.text()
-            alt = self.additem_dlg.altText.text()
+            if len(self.additem_dlg.altText.text()) == 0:
+                alt = self.additem_dlg.coreText.text()
+            else:
+                alt = self.additem_dlg.altText.text()
+
             tab = self.criteriaTabs.currentWidget()
             # print(tab)
             # tabLayout = tab.layout()
@@ -336,7 +351,121 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
         tw.clearSelection()
 
+#Secondary Dynamic Layers
+    def addSDLTab(self):
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            SDL = self.additem_dlg.coreText.text()
+            tab = QWidget()
+            tabTree = QTreeWidget()
+            #print(tabTree)
+            tabLayout = QVBoxLayout()
 
+            tabLayout.addWidget(tabTree)
+            tabLayout.setSizeConstraint(QLayout.SetFixedSize)
+            tabTree.setFixedWidth(810)
+            tabTree.setFixedHeight(300)
+            tabTree.setColumnCount(3)
+            tab.setLayout(tabLayout)
+            self.SDLItems.insertTab(self.SDLItems.count(), tab, SDL)
+            #print(tab.children())
+            self.dynamicLayersList()
+
+    def removeSDLTab(self):
+        if self.SDLItems.count() > 0:
+            self.SDLItems.removeTab(self.SDLItems.currentIndex())
+            self.dynamicLayersList()
+
+    def addSDLItem(self):
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            item = self.additem_dlg.coreText.text()
+            tab = self.SDLItems.currentWidget()
+            # print(tab)
+            # tabLayout = tab.layout()
+            # print(tabLayout)
+            treeWidget = tab.children()[1]
+            #print(treeWidget)
+            twi = QTreeWidgetItem(treeWidget,[item],0)
+            treeWidget.expandItem(twi)
+            self.dynamicLayersList()
+
+    def removeSDLItem(self):
+        tab = self.SDLItems.currentWidget()
+        tw = tab.children()[1]
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx != -1:
+                tw.takeTopLevelItem(idx)
+
+
+
+        self.dynamicLayersList()
+
+    def addSDLProperty(self):
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            item = self.additem_dlg.coreText.text()
+
+            tab = self.SDLItems.currentWidget()
+
+            treeWidget = tab.children()[1]
+            if len(treeWidget.selectedItems()) != 0:#item selected:
+                twi = treeWidget.currentItem()
+                twi = QTreeWidgetItem(twi,['Property','', item],0)
+
+
+    def addSDLExistingProperty(self):
+        self.addProperty_dlg = mbb_dialog_addproperty(self.criteriaTabs)
+        self.addProperty_dlg.show()
+        result = self.addProperty_dlg.exec_()
+        if result:
+            item = self.addProperty_dlg.item.currentText()
+            property = self.addProperty_dlg.property.currentText()
+
+            tab = self.SDLItems.currentWidget()
+
+            treeWidget = tab.children()[1]
+            if len(treeWidget.selectedItems()) != 0:#item selected:
+                twi = treeWidget.currentItem()
+                twi = QTreeWidgetItem(twi,['Existing Property',item,''],0)
+
+    def addSDLCriteria(self):
+        self.addProperty_dlg = mbb_dialog_addproperty(self.criteriaTabs)
+        self.addProperty_dlg.show()
+        result = self.addProperty_dlg.exec_()
+        if result:
+            item = self.addProperty_dlg.item.currentText()
+            property = self.addProperty_dlg.property.currentText()
+
+            tab = self.SDLItems.currentWidget()
+
+            treeWidget = tab.children()[1]
+            if len(treeWidget.selectedItems()) != 0:#item selected:
+                twi = treeWidget.currentItem()
+                twi = QTreeWidgetItem(twi,['Criteria',item, property],0)
+
+
+    def removeSDLFeature(self):
+        tab = self.SDLItems.currentWidget()
+        tw = tab.children()[1]
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx == -1:
+                twi = item.parent()
+                idx = twi.indexOfChild(item)
+                twi.takeChild(idx)
+
+
+#
     def returnValues(self):
 
         return self.headerLength, os.path.join(self.setupPath, self.setupName + ".QMapSetup"), self.template, self.templateMaps
@@ -412,6 +541,12 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             headerLabels.append(self.criteriaTabs.tabText(i))
             lyrs = self.deepSearch(lyrs,searchList)
 
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            treeWidget = tab.children()[1]
+            headerLabels.append('<><> SECONDARY <><> ' + self.SDLItems.tabText(i))
+
+
 
         self.previewTree.clear()
         self.previewTree.setColumnCount(0)
@@ -422,6 +557,9 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             cols = []
             cols.append(layer[0].name())
             cols.extend(layer[1])
+
+            #ADD SDL to cols
+
             twi = QTreeWidgetItem(self.previewTree,cols,0)
             #print(layer[1])
         self.dynamicLayers = lyrs
@@ -440,6 +578,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             reader = list(csv.reader(csvfile, delimiter=','))
             headerLength = reader[0][1]
 
+#Map Items
     def selectMapItems(self):
         for i in range(0, self.mapItems.count()  - 1):
             self.mapItems.removeTab(i)
@@ -480,7 +619,6 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 item = layer.text()
                 twi = QTreeWidgetItem(treeWidget,[item],0)
 
-
     def removeMapItem(self):
         tab = self.mapItems.currentWidget()
         tw = tab.children()[1]
@@ -511,7 +649,6 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                     item = twi.takeChild(idx)
                     twi.insertChild(idx - 1, item)
 
-
     def confirmMapItems(self):
         self.mapsHeaderQMS = []
         self.mapsDetailsQMS = []
@@ -521,7 +658,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             self.mapsDetailsQMS.append([map.displayName])
         return True
 
-
+#Search Tools
     def deepSearch(self, layers, searchList):
         #print(layers)
         #print(searchList)
