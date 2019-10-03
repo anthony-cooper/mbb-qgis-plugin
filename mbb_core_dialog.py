@@ -126,7 +126,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.addCriteriaTab()
         if name == 'Dynamic':                                  #Lead Dynamic Layer
             validEntry = self.dynamicLayersList()
-        if name == 'DynamicDetails':                           #Dynamic details
+        if name == 'SDLs':                                      #Secondary Dynamic Layers
             validEntry = self.confirmDynamicDetails()
             validEntry = self.selectMapItems()
         if name == 'Maps':                                     #Maps
@@ -200,6 +200,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         layersHeaderQMS.append('Lead Dynamic Layer')
         for i in range(0, self.criteriaTabs.count()):
             layersHeaderQMS.append(self.criteriaTabs.tabText(i))
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            layersHeaderQMS.append('<><> SECONDARY <><> ' + self.SDLItems.tabText(i))
+
+
         for i in range(0, self.mapItems.count()):
             layersHeaderQMS.append(self.mapItems.tabText(i) + '_Layers')
 
@@ -211,6 +216,12 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             writer = csv.writer(file)
             writer.writerows(headerQMS)
             writer.writerow(layersHeaderQMS)
+
+            sdlOpts = []
+            for i in range(0, self.SDLItems.count()):
+                tab = self.SDLItems.widget(i)
+                sdlOpts.append('<><> SECONDARY <><> ' + self.SDLItems.tabText(i))
+
 
 
             iterator = QTreeWidgetItemIterator(self.previewTree)
@@ -230,6 +241,13 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                         mapItem = mapIterator.value()
                         if mapItem.text(0) == '<><> LEAD DYNAMIC LAYER <><>':
                             mapLayers.append(item.text(0))
+                        elif '<><> SECONDARY <><>' in mapItem.text(0):
+                            #print(sdlOpts)
+                            #print(mapItem.text(0))
+                            #print(sdlOpts.index(mapItem.text(0)))
+                            #print(item.columnCount() - (sdlOpts.index(mapItem.text(0))))
+
+                            mapLayers.append(item.text(item.columnCount() - 1 - (sdlOpts.index(mapItem.text(0)))))
                         else:
                             mapLayers.append(mapItem.text(0))
                         mapIterator += 1
@@ -574,6 +592,11 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                         prop.append(sdlItem.text(2))
                     elif sdlItem.text(0) == 'Existing Property':
                         prop.append('<<E>>' + sdlItem.text(1))
+                else:
+                    sdlCon.append([crit,prop])
+                    crit =  []
+                    prop = []
+
 
                 sdlIterator += 1
             sdlCon.append([crit,prop])
@@ -589,8 +612,10 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             cols.extend(layer[1])
 
             #ADD SDL to cols
-            sd = []
+
             for sdl in sdlCon:
+                sd = []
+                out =''
                 if len(sdl[0])>0 or len(sdl[1])>0:
                     op = True
                     for cr in sdl[0]:
@@ -608,8 +633,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                             if lyp:
                                 #print(ly)
                                 sd.append(ly[0].name())
-                        #print(sd)
-                        cols.append(('|'.join(sd)))
+                    out = '|'.join(sd)
+                    cols.append(out)
 
 
 
@@ -633,7 +658,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
 #Map Items
     def selectMapItems(self):
-        for i in range(0, self.mapItems.count()  - 1):
+        for i in range(0, self.mapItems.count()):
             self.mapItems.removeTab(i)
 
         for mapItem in self.templateMaps:
@@ -658,6 +683,10 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         layers = QgsProject.instance().mapLayers()
         layerList.clear()
         layerList.addItem('<><> LEAD DYNAMIC LAYER <><>')
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            layerList.addItem('<><> SECONDARY <><> ' + self.SDLItems.tabText(i))
+
         for layer_id, layer in layers.items():
             layerList.addItem(layer.name())
 
