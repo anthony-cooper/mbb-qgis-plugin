@@ -420,6 +420,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Property','', item],0)
+            self.dynamicLayersList()
+
 
 
     def addSDLExistingProperty(self):
@@ -436,6 +438,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Existing Property',item,''],0)
+            self.dynamicLayersList()
+
 
     def addSDLCriteria(self):
         self.addProperty_dlg = mbb_dialog_addproperty(self.criteriaTabs)
@@ -451,6 +455,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Criteria',item, property],0)
+            self.dynamicLayersList()
 
 
     def removeSDLFeature(self):
@@ -463,6 +468,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 twi = item.parent()
                 idx = twi.indexOfChild(item)
                 twi.takeChild(idx)
+        self.dynamicLayersList()
 
 
 #
@@ -552,6 +558,30 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.previewTree.setColumnCount(0)
         self.previewTree.setHeaderLabels(headerLabels)
 
+        sdlCon = []
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            treeWidget = tab.children()[1]
+            sdlIterator = QTreeWidgetItemIterator(treeWidget)
+            crit =  []
+            prop = []
+            while sdlIterator.value():
+                sdlItem = sdlIterator.value()
+                if sdlItem.childCount() == 0:
+                    if sdlItem.text(0) == 'Criteria':
+                        crit.append(sdlItem.text(2))
+                    elif sdlItem.text(0) == 'Property':
+                        prop.append(sdlItem.text(2))
+                    elif sdlItem.text(0) == 'Existing Property':
+                        prop.append('<<E>>' + sdlItem.text(1))
+
+                sdlIterator += 1
+            sdlCon.append([crit,prop])
+
+        #print(sdlCon)
+
+
+
         for layer in lyrs:
             #print(layer)
             cols = []
@@ -559,6 +589,29 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             cols.extend(layer[1])
 
             #ADD SDL to cols
+            sd = []
+            for sdl in sdlCon:
+                if len(sdl[0])>0 or len(sdl[1])>0:
+                    op = True
+                    for cr in sdl[0]:
+                        if cr not in layer[0].name():
+                            op = False
+
+                    if op:
+                        #print(sdl[1])
+                        #print(self.layers)
+                        for ly in self.layers:
+                            lyp = True
+                            for pr in sdl[1]:
+                                if pr not in ly[0].name():
+                                    lyp = False
+                            if lyp:
+                                #print(ly)
+                                sd.append(ly[0].name())
+                        #print(sd)
+                        cols.append(('|'.join(sd)))
+
+
 
             twi = QTreeWidgetItem(self.previewTree,cols,0)
             #print(layer[1])
