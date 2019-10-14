@@ -25,6 +25,7 @@
 
 import os
 import csv
+from qgis.PyQt import *
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtWidgets import *
@@ -140,6 +141,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.update_buttons()   #update the buttons
             else:
                 self.writeSetupFile()
+                self.save_trees()
                 if self.newLayout: #Check if new layout and load if neccessary
                     manager = QgsProject.instance().layoutManager()
                     manager.addLayout(self.template)
@@ -259,6 +261,73 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
                 writer.writerow(layerRow)
                 iterator += 1
+
+#Save tree
+    # def saveS(self):
+    #     for i in range(0, self.criteriaTabs.count()):
+    #         tab = self.criteriaTabs.widget(i)
+    #         treeWidget = tab.children()[1]
+    #         self.save_tree(treeWidget)
+    #
+    #RESTORE
+    #         file = QtCore.QFile('native_tree_save.qfile')
+    #         file.open(QtCore.QIODevice.ReadOnly)
+    #         datastream = QtCore.QDataStream(file)
+    #         child=QtGui.QTreeWidgetItem(self.tree.invisibleRootItem())
+    #         child.read(datastream)
+    #         num_childs=datastream.readUInt32()
+    #         self.restore_item(datastream,child,num_childs)
+
+
+
+
+
+    def save_trees(self):
+        directory = os.path.join(self.setupPath,"fstore")
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        for i in range(0, self.criteriaTabs.count()):
+            tab = self.criteriaTabs.widget(i)
+            tabName = self.criteriaTabs.tabText(i)
+            treeWidget = tab.children()[1]
+
+            file = QtCore.QFile(os.path.join(self.setupPath,"fstore", self.setupName + "_dynamic_" + tabName + ".qfile"))
+            file.open(QtCore.QIODevice.WriteOnly)
+            datastream = QtCore.QDataStream(file)
+            self.save_item(treeWidget.invisibleRootItem(),datastream)
+
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            tabName = self.SDLItems.tabText(i)
+            treeWidget = tab.children()[1]
+
+            file = QtCore.QFile(os.path.join(self.setupPath, "fstore", self.setupName + "_secondary_" + tabName + ".qfile"))
+            file.open(QtCore.QIODevice.WriteOnly)
+            datastream = QtCore.QDataStream(file)
+            self.save_item(treeWidget.invisibleRootItem(),datastream)
+
+
+        for i in range(0, self.mapItems.count()):
+            tab = self.mapItems.widget(i)
+            tabName = self.mapItems.tabText(i)
+            treeWidget = tab.children()[1]
+
+            file = QtCore.QFile(os.path.join(self.setupPath, "fstore", self.setupName + "_map_" + tabName + ".qfile"))
+            file.open(QtCore.QIODevice.WriteOnly)
+            datastream = QtCore.QDataStream(file)
+            self.save_item(treeWidget.invisibleRootItem(),datastream)
+
+
+    def save_item(self,item,datastream):
+        num_childs=item.childCount()
+        for i in range(0,num_childs):
+            child = item.child(i)
+            child.write(datastream)
+            num_childs=child.childCount()
+            datastream.writeUInt32(num_childs)
+            self.save_item(child,datastream)
+
 
 #Lead Dynamic Layers
     def addCriteriaTab(self):
