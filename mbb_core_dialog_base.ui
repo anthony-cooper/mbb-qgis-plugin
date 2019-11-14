@@ -19,14 +19,14 @@
      <x>10</x>
      <y>40</y>
      <width>851</width>
-     <height>671</height>
+     <height>511</height>
     </rect>
    </property>
    <property name="frameShape">
     <enum>QFrame::Box</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="Setup">
     <widget class="QRadioButton" name="loadExisting">
@@ -299,465 +299,118 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:16pt; font-weight:600;&quot;&gt;Setup Dynamic Items&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:16pt; font-weight:600;&quot;&gt;Setup Lead Dynamic Layer&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QTabWidget" name="criteriaTabs">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
-       <width>201</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>No Automatic Dynamic Items</string>
-     </property>
-    </widget>
-    <widget class="QListWidget" name="previewList">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>520</y>
+       <y>50</y>
        <width>831</width>
-       <height>141</height>
+       <height>421</height>
       </rect>
      </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="showDropIndicator" stdset="0">
-      <bool>false</bool>
-     </property>
-     <property name="defaultDropAction">
-      <enum>Qt::IgnoreAction</enum>
-     </property>
-     <property name="alternatingRowColors">
-      <bool>true</bool>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
+     <property name="currentIndex">
+      <number>-1</number>
      </property>
     </widget>
-    <widget class="QLabel" name="label">
+    <widget class="QPushButton" name="addCriteria">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>500</y>
-       <width>311</width>
+       <y>480</y>
+       <width>111</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Dynamic Items Order Preview</string>
+      <string>Add Criteria</string>
      </property>
     </widget>
-    <widget class="QFrame" name="Types">
+    <widget class="QPushButton" name="addProperty">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>70</y>
-       <width>231</width>
-       <height>431</height>
+       <x>370</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
       </rect>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
+     <property name="text">
+      <string>Add Property</string>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <widget class="QLabel" name="label_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Types</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="tAdd">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>370</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Add Type</string>
-      </property>
-      <property name="checkable">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="tRemove">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>400</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Remove Type</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="tMoveUp">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>400</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Move Type Up</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="tIncrease">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>370</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Increase Priority</string>
-      </property>
-     </widget>
-     <widget class="QTreeWidget" name="tTree">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>20</y>
-        <width>231</width>
-        <height>341</height>
-       </rect>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="alternatingRowColors">
-       <bool>true</bool>
-      </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectItems</enum>
-      </property>
-      <property name="autoExpandDelay">
-       <number>0</number>
-      </property>
-      <property name="itemsExpandable">
-       <bool>true</bool>
-      </property>
-      <property name="sortingEnabled">
-       <bool>false</bool>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="columnCount">
-       <number>1</number>
-      </property>
-      <attribute name="headerVisible">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="headerMinimumSectionSize">
-       <number>49</number>
-      </attribute>
-      <attribute name="headerShowSortIndicator" stdset="0">
-       <bool>false</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </column>
-     </widget>
     </widget>
-    <widget class="QFrame" name="Scenarios">
+    <widget class="QPushButton" name="removeCriteria">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove Criteria</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeProperty">
      <property name="geometry">
       <rect>
        <x>490</x>
-       <y>70</y>
-       <width>351</width>
-       <height>431</height>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
       </rect>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
+     <property name="text">
+      <string>Remove Property</string>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Scenarios</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="sAdd">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>370</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Add Scenario</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="sRemove">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>400</y>
-        <width>231</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Remove (Sub-)Scenario</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="sMoveUp">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>400</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Move Type Up</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="sIncrease">
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>370</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Increase Priority</string>
-      </property>
-     </widget>
-     <widget class="QTreeWidget" name="sTree">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>20</y>
-        <width>351</width>
-        <height>341</height>
-       </rect>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="alternatingRowColors">
-       <bool>true</bool>
-      </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectItems</enum>
-      </property>
-      <property name="autoExpandDelay">
-       <number>0</number>
-      </property>
-      <property name="itemsExpandable">
-       <bool>true</bool>
-      </property>
-      <property name="sortingEnabled">
-       <bool>false</bool>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="columnCount">
-       <number>1</number>
-      </property>
-      <attribute name="headerVisible">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="headerShowSortIndicator" stdset="0">
-       <bool>false</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </column>
-     </widget>
-     <widget class="QPushButton" name="sAdd_2">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>370</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Add Sub-Scenario</string>
-      </property>
-     </widget>
     </widget>
-    <widget class="QFrame" name="Events">
+    <widget class="QPushButton" name="upCriteria">
      <property name="geometry">
       <rect>
        <x>250</x>
-       <y>70</y>
-       <width>231</width>
-       <height>431</height>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
       </rect>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
+     <property name="text">
+      <string>Move Criteria Up</string>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
+    </widget>
+    <widget class="QPushButton" name="upProperty">
+     <property name="geometry">
+      <rect>
+       <x>610</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
      </property>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Events</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="eAdd">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>370</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Add Event</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="eRemove">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>400</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Remove Event</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="eMoveUp">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>400</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Move Event Up</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="eIncrease">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>370</y>
-        <width>111</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Increase Priority</string>
-      </property>
-     </widget>
-     <widget class="QTreeWidget" name="eTree">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>20</y>
-        <width>231</width>
-        <height>341</height>
-       </rect>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="alternatingRowColors">
-       <bool>true</bool>
-      </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectItems</enum>
-      </property>
-      <property name="autoExpandDelay">
-       <number>0</number>
-      </property>
-      <property name="itemsExpandable">
-       <bool>true</bool>
-      </property>
-      <property name="sortingEnabled">
-       <bool>false</bool>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="columnCount">
-       <number>1</number>
-      </property>
-      <attribute name="headerVisible">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="headerShowSortIndicator" stdset="0">
-       <bool>false</bool>
-      </attribute>
-      <column>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </column>
-     </widget>
+     <property name="text">
+      <string>Move Property Up</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="deselProperty">
+     <property name="geometry">
+      <rect>
+       <x>730</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Deselect Property</string>
+     </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="DynamicDetails">
+   <widget class="QWidget" name="SDLs">
     <widget class="QLabel" name="title_label_6">
      <property name="geometry">
       <rect>
@@ -772,10 +425,127 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:16pt; font-weight:600;&quot;&gt;Review of Maps to be created&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:16pt; font-weight:600;&quot;&gt;Setup secondary dynamic layers&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDLI">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>480</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add Item</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDLC">
+     <property name="geometry">
+      <rect>
+       <x>580</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add condition</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeSDL">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>480</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove SDL</string>
+     </property>
+    </widget>
+    <widget class="QTabWidget" name="SDLItems">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>831</width>
+       <height>421</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeSDLI">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>480</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove Item</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDLP">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>480</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add Property</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDLExistingP">
+     <property name="geometry">
+      <rect>
+       <x>460</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add Existing Prop</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addSDL">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>480</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add SDL</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeSDLF">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>480</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove thing</string>
      </property>
     </widget>
    </widget>
@@ -804,13 +574,65 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
+       <y>50</y>
        <width>831</width>
-       <height>621</height>
+       <height>421</height>
       </rect>
      </property>
      <property name="currentIndex">
       <number>-1</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeMap">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>480</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Remove Map Layer(s)</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addMap">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>480</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add Map Layer(s)</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="upMap">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>480</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Move Layer(s) Up</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addCriteria_6">
+     <property name="geometry">
+      <rect>
+       <x>490</x>
+       <y>480</y>
+       <width>151</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Toggle Legend</string>
      </property>
     </widget>
    </widget>
@@ -884,6 +706,47 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QTreeWidget" name="previewTree">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>570</y>
+     <width>851</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="alternatingRowColors">
+    <bool>true</bool>
+   </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::NoSelection</enum>
+   </property>
+   <property name="headerHidden">
+    <bool>false</bool>
+   </property>
+   <property name="columnCount">
+    <number>0</number>
+   </property>
+   <attribute name="headerVisible">
+    <bool>true</bool>
+   </attribute>
+   <attribute name="headerDefaultSectionSize">
+    <number>500</number>
+   </attribute>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>550</y>
+     <width>311</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Lead Dynamic Layer Preview</string>
    </property>
   </widget>
  </widget>

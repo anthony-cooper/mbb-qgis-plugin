@@ -25,12 +25,15 @@
 
 import os
 import csv
+from qgis.PyQt import *
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtWidgets import *
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import *
 from .mbb_core_dialog_additem import mbb_dialog_additem
+from .mbb_core_dialog_addmap import mbb_dialog_addmap
+from .mbb_core_dialog_addproperty import mbb_dialog_addproperty
 
 
 
@@ -57,20 +60,33 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.stackedWidget.currentChanged.connect(self.update_buttons)
         self.nextButton.clicked.connect(self.__next__)
         self.prevButton.clicked.connect(self.prev)
-        self.tAdd.clicked.connect(lambda: self.addDynamicItem(0))
-        self.eAdd.clicked.connect(lambda: self.addDynamicItem(1))
-        self.sAdd.clicked.connect(lambda: self.addDynamicItem(2))
-        self.sAdd_2.clicked.connect(lambda: self.addDynamicItem(3))
-        self.tRemove.clicked.connect(lambda: self.removeDynamicItem(0))
-        self.eRemove.clicked.connect(lambda: self.removeDynamicItem(1))
-        self.sRemove.clicked.connect(lambda: self.removeDynamicItem(2))
+
+        self.addCriteria.clicked.connect(lambda: self.addCriteriaTab())
+        self.addProperty.clicked.connect(lambda: self.addPropertyItem())
+        self.removeCriteria.clicked.connect(lambda: self.removeCriteriaTab())
+        self.removeProperty.clicked.connect(lambda: self.removePropertyItem())
+        self.upCriteria.clicked.connect(lambda: self.moveUpCriteriaTab())
+        self.upProperty.clicked.connect(lambda: self.moveUpPropertyItem())
+        self.deselProperty.clicked.connect(lambda: self.deselectProperty())
+
+        self.addSDL.clicked.connect(lambda: self.addSDLTab())
+        self.addSDLC.clicked.connect(lambda: self.addSDLCriteria())
+        self.addSDLExistingP.clicked.connect(lambda: self.addSDLExistingProperty())
+        self.addSDLI.clicked.connect(lambda: self.addSDLItem())
+        self.addSDLP.clicked.connect(lambda: self.addSDLProperty())
+        self.removeSDL.clicked.connect(lambda: self.removeSDLTab())
+        self.removeSDLI.clicked.connect(lambda: self.removeSDLItem())
+        self.removeSDLF.clicked.connect(lambda: self.removeSDLFeature())
+
+
+
+        self.addMap.clicked.connect(lambda: self.addMapItem())
+        self.removeMap.clicked.connect(lambda: self.removeMapItem())
+        self.upMap.clicked.connect(lambda: self.moveUpMapItem())
+
 
         self.existingTemplateBrowser.clicked.connect(lambda: self.loadExistingFile(self.existingTemplate, 'QGIS Print Composer Template (*.qpt)'))
 
-        self.sMoveUp.clicked.connect(lambda: self.createSearchList(self.tTree))
-        self.sTree.clear()
-        self.eTree.clear()
-        self.tTree.clear()
 
         self.otherItem = 'All (Other) Items'
 
@@ -100,16 +116,18 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     def __next__(self):
         name = (self.stackedWidget.currentWidget()).objectName()
         i = self.stackedWidget.currentIndex()
-        validEntry = True
+        validEntry = False
 
         #Check valid entry for sheet #, and prep next sheet
         if name == 'Setup':                                    #Setup
             validEntry = self.setup()
         if name == 'Template':                                 #Template
             validEntry = self.setupTemplate()
-        if name == 'Dynamic':                                  #Dynamic
+            if self.criteriaTabs.count() == 0:
+                self.addCriteriaTab()
+        if name == 'Dynamic':                                  #Lead Dynamic Layer
             validEntry = self.dynamicLayersList()
-        if name == 'DynamicDetails':                           #Dynamic details
+        if name == 'SDLs':                                      #Secondary Dynamic Layers
             validEntry = self.confirmDynamicDetails()
             validEntry = self.selectMapItems()
         if name == 'Maps':                                     #Maps
@@ -123,6 +141,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.update_buttons()   #update the buttons
             else:
                 self.writeSetupFile()
+                self.save_trees()
                 if self.newLayout: #Check if new layout and load if neccessary
                     manager = QgsProject.instance().layoutManager()
                     manager.addLayout(self.template)
@@ -144,7 +163,12 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.layers = []
 
         # Fetch the currently loaded layers
-        self.layers = self.load_all_layers(QgsProject.instance().layerTreeRoot().children(), self.layers)
+        #self.layers = self.load_all_layers(QgsProject.instance().layerTreeRoot().children(), self.layers)
+        lyrs = QgsProject.instance().mapLayers()
+        for layer_id, layer in lyrs.items():
+            self.layers.append([layer,[]])
+
+
 
         # Fetch the current project layouts
         manager = QgsProject.instance().layoutManager()
@@ -170,11 +194,22 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.headerLength = len(headerQMS)
         headerQMS[0][1] = self.headerLength
 
-        layersHeaderQMS = []
-        layersHeaderQMS.extend(self.itemsHeaderQMS)
-        layersHeaderQMS.extend(self.mapsHeaderQMS)
+        mapDetailsHeader = ['MAP','easting','northing']
+        mapDetails = ['MAP',0,0]
 
-        self.generateSheetsList()
+        layersHeaderQMS = []
+        layersHeaderQMS.extend(mapDetailsHeader)
+        layersHeaderQMS.append('Lead Dynamic Layer')
+        for i in range(0, self.criteriaTabs.count()):
+            layersHeaderQMS.append(self.criteriaTabs.tabText(i))
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            layersHeaderQMS.append('<><> SECONDARY <><> ' + self.SDLItems.tabText(i))
+
+
+        for i in range(0, self.mapItems.count()):
+            layersHeaderQMS.append(self.mapItems.tabText(i) + '_Layers')
+
 
         if os.path.exists(os.path.join(self.setupPath, self.setupName + ".QMapSetup")):
             os.remove(os.path.join(self.setupPath, self.setupName + ".QMapSetup"))
@@ -183,19 +218,367 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             writer = csv.writer(file)
             writer.writerows(headerQMS)
             writer.writerow(layersHeaderQMS)
-            writer.writerows(self.mapSheetsQMS)
 
-    def generateSheetsList(self):
-        self.mapSheetsQMS = []
-        #for location in locations:
-        for layer in self.dynamicLayers:
-            details = [123,456,layer.name(), 'Dynamic Layer']
-            for map in self.templateMaps:
-                details.extend([25000, 15, 'layer'+'|'+'dylayer'])
-            self.mapSheetsQMS.append(details)
+            sdlOpts = []
+            for i in range(0, self.SDLItems.count()):
+                tab = self.SDLItems.widget(i)
+                sdlOpts.append('<><> SECONDARY <><> ' + self.SDLItems.tabText(i))
 
 
 
+            iterator = QTreeWidgetItemIterator(self.previewTree)
+            while iterator.value():
+                item = iterator.value()
+                layerRow = []
+                layerRow.extend(mapDetails)
+                for i in range(0, item.columnCount()):
+                    layerRow.append(item.text(i))
+
+                for i in range(0, self.mapItems.count()):
+                    tab = self.mapItems.widget(i)
+                    treeWidget = tab.children()[1]
+                    mapIterator = QTreeWidgetItemIterator(treeWidget)
+                    mapLayers = []
+                    while mapIterator.value():
+                        mapItem = mapIterator.value()
+                        if mapItem.text(0) == '<><> LEAD DYNAMIC LAYER <><>':
+                            mapLayers.append(item.text(0))
+                        elif '<><> SECONDARY <><>' in mapItem.text(0):
+                            #print(sdlOpts)
+                            #print(mapItem.text(0))
+                            #print(sdlOpts.index(mapItem.text(0)))
+                            #print(item.columnCount() - (sdlOpts.index(mapItem.text(0))))
+
+                            mapLayers.append(item.text(item.columnCount() - 1 - (sdlOpts.index(mapItem.text(0)))))
+                        else:
+                            mapLayers.append(mapItem.text(0))
+                        mapIterator += 1
+                    layerRow.append('|'.join(mapLayers))
+
+
+
+
+
+                writer.writerow(layerRow)
+                iterator += 1
+
+#Save tree
+    # def saveS(self):
+    #     for i in range(0, self.criteriaTabs.count()):
+    #         tab = self.criteriaTabs.widget(i)
+    #         treeWidget = tab.children()[1]
+    #         self.save_tree(treeWidget)
+    #
+    #RESTORE
+                # self.tree=QtGui.QTreeWidget(self)                #
+                # self.tree.setObjectName("treeWidget")            #
+                # self.add_button=QtGui.QPushButton("Add", self)   # Initialize a simple
+                # self.save_button=QtGui.QPushButton("Save", self) # form containing a
+                # gridlayout = QtGui.QGridLayout(self)             # treeWidget, an
+                # gridlayout.addWidget(self.tree,1,0,1,9)          # 'Add' button, and a
+                # gridlayout.addWidget(self.add_button,2,0,2,3)    # 'Save' button
+                # gridlayout.addWidget(self.save_button,2,3,2,3)   #
+                # self.tree.headerItem().setText(0,"Label")        #
+
+    #         file = QtCore.QFile('native_tree_save.qfile')
+    #         file.open(QtCore.QIODevice.ReadOnly)
+    #         datastream = QtCore.QDataStream(file)
+    #         child=QtGui.QTreeWidgetItem(self.tree.invisibleRootItem())
+    #         child.read(datastream)
+    #         num_childs=datastream.readUInt32()
+    #         self.restore_item(datastream,child,num_childs)
+
+
+
+
+
+    def save_trees(self):
+        directory = os.path.join(self.setupPath,"fstore")
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        for i in range(0, self.criteriaTabs.count()):
+            tab = self.criteriaTabs.widget(i)
+            tabName = self.criteriaTabs.tabText(i)
+            treeWidget = tab.children()[1]
+
+            file = QtCore.QFile(os.path.join(self.setupPath,"fstore", self.setupName + "_dynamic_" + tabName + ".qfile"))
+            file.open(QtCore.QIODevice.WriteOnly)
+            datastream = QtCore.QDataStream(file)
+            self.save_item(treeWidget.invisibleRootItem(),datastream)
+
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            tabName = self.SDLItems.tabText(i)
+            treeWidget = tab.children()[1]
+
+            file = QtCore.QFile(os.path.join(self.setupPath, "fstore", self.setupName + "_secondary_" + tabName + ".qfile"))
+            file.open(QtCore.QIODevice.WriteOnly)
+            datastream = QtCore.QDataStream(file)
+            self.save_item(treeWidget.invisibleRootItem(),datastream)
+
+
+        for i in range(0, self.mapItems.count()):
+            tab = self.mapItems.widget(i)
+            tabName = self.mapItems.tabText(i)
+            treeWidget = tab.children()[1]
+
+            file = QtCore.QFile(os.path.join(self.setupPath, "fstore", self.setupName + "_map_" + tabName + ".qfile"))
+            file.open(QtCore.QIODevice.WriteOnly)
+            datastream = QtCore.QDataStream(file)
+            self.save_item(treeWidget.invisibleRootItem(),datastream)
+
+
+    def save_item(self,item,datastream):
+        num_childs=item.childCount()
+        for i in range(0,num_childs):
+            child = item.child(i)
+            child.write(datastream)
+            num_childs=child.childCount()
+            datastream.writeUInt32(num_childs)
+            self.save_item(child,datastream)
+
+    def restore_item(self,datastream,item,num_childs):
+        for i in range(0, num_childs):
+            child=QtGui.QTreeWidgetItem(item)
+            child.read(datastream)
+            num_childs=datastream.readUInt32()
+            self.restore_item(datastream,child,num_childs)
+
+#Lead Dynamic Layers
+    def addCriteriaTab(self):
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            criteria = self.additem_dlg.coreText.text()
+            tab = QWidget()
+            tabTree = QTreeWidget()
+            #print(tabTree)
+            tabLayout = QVBoxLayout()
+
+            tabLayout.addWidget(tabTree)
+            tabLayout.setSizeConstraint(QLayout.SetFixedSize)
+            tabTree.setFixedWidth(810)
+            tabTree.setFixedHeight(300)
+            tabTree.setColumnCount(2)
+            tabTree.setHeaderLabels(['Search Text', 'Written Text'])
+            tab.setLayout(tabLayout)
+            self.criteriaTabs.insertTab(self.criteriaTabs.count(), tab, criteria)
+            #print(tab.children())
+            self.dynamicLayersList()
+
+    def removeCriteriaTab(self):
+        if self.criteriaTabs.count() > 1:
+            self.criteriaTabs.removeTab(self.criteriaTabs.currentIndex())
+            self.dynamicLayersList()
+
+    def moveUpCriteriaTab(self):
+        loc = self.criteriaTabs.currentIndex()
+        if loc > 0:
+            name = self.criteriaTabs.tabText(loc)
+            widget = self.criteriaTabs.currentWidget()
+            self.criteriaTabs.removeTab(loc)
+            self.criteriaTabs.insertTab(loc - 1, widget,name)
+            self.dynamicLayersList()
+
+    def addPropertyItem(self):
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            item = self.additem_dlg.coreText.text()
+            if len(self.additem_dlg.altText.text()) == 0:
+                alt = self.additem_dlg.coreText.text()
+            else:
+                alt = self.additem_dlg.altText.text()
+
+            tab = self.criteriaTabs.currentWidget()
+            # print(tab)
+            # tabLayout = tab.layout()
+            # print(tabLayout)
+            treeWidget = tab.children()[1]
+            #print(treeWidget)
+            if len(treeWidget.selectedItems()) == 0:#item not selected:
+                twi = QTreeWidgetItem(treeWidget,[item, alt],0)
+                twi.addChild(QTreeWidgetItem([self.otherItem, alt],0))
+                treeWidget.expandItem(twi)
+            else: #item selected:
+                twi = treeWidget.currentItem()
+                twi = QTreeWidgetItem(twi,[item, alt],0)
+                twi.addChild(QTreeWidgetItem([self.otherItem, alt],0))
+                treeWidget.expandItem(twi)
+
+
+            self.dynamicLayersList()
+
+    def removePropertyItem(self):
+        tab = self.criteriaTabs.currentWidget()
+        tw = tab.children()[1]
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx != -1:
+                tw.takeTopLevelItem(idx)
+            else:
+                twi = item.parent()
+                idx = twi.indexOfChild(item)
+                twi.takeChild(idx)
+
+
+        self.dynamicLayersList()
+
+    def moveUpPropertyItem(self):
+        tab = self.criteriaTabs.currentWidget()
+        tw = tab.children()[1]
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx != -1:
+                if idx > 0:
+                    item = tw.takeTopLevelItem(idx)
+                    tw.insertTopLevelItem(idx - 1, item)
+                    tw.setCurrentItem(item)
+
+            else:
+                twi = item.parent()
+                idx = twi.indexOfChild(item)
+                if idx > 0:
+                    item = twi.takeChild(idx)
+                    twi.insertChild(idx - 1, item)
+                    tw.setCurrentItem(item)
+
+
+
+        self.dynamicLayersList()
+
+    def deselectProperty(self):
+        tab = self.criteriaTabs.currentWidget()
+        tw = tab.children()[1]
+
+        tw.clearSelection()
+
+#Secondary Dynamic Layers
+    def addSDLTab(self):
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            SDL = self.additem_dlg.coreText.text()
+            tab = QWidget()
+            tabTree = QTreeWidget()
+            #print(tabTree)
+            tabLayout = QVBoxLayout()
+
+            tabLayout.addWidget(tabTree)
+            tabLayout.setSizeConstraint(QLayout.SetFixedSize)
+            tabTree.setFixedWidth(810)
+            tabTree.setFixedHeight(300)
+            tabTree.setColumnCount(3)
+            tab.setLayout(tabLayout)
+            self.SDLItems.insertTab(self.SDLItems.count(), tab, SDL)
+            #print(tab.children())
+            self.dynamicLayersList()
+
+    def removeSDLTab(self):
+        if self.SDLItems.count() > 0:
+            self.SDLItems.removeTab(self.SDLItems.currentIndex())
+            self.dynamicLayersList()
+
+    def addSDLItem(self):
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            item = self.additem_dlg.coreText.text()
+            tab = self.SDLItems.currentWidget()
+            # print(tab)
+            # tabLayout = tab.layout()
+            # print(tabLayout)
+            treeWidget = tab.children()[1]
+            #print(treeWidget)
+            twi = QTreeWidgetItem(treeWidget,[item],0)
+            treeWidget.expandItem(twi)
+            self.dynamicLayersList()
+
+    def removeSDLItem(self):
+        tab = self.SDLItems.currentWidget()
+        tw = tab.children()[1]
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx != -1:
+                tw.takeTopLevelItem(idx)
+
+
+
+        self.dynamicLayersList()
+
+    def addSDLProperty(self):
+        self.additem_dlg = mbb_dialog_additem()
+        self.additem_dlg.show()
+        result = self.additem_dlg.exec_()
+        if result:
+            item = self.additem_dlg.coreText.text()
+
+            tab = self.SDLItems.currentWidget()
+
+            treeWidget = tab.children()[1]
+            if len(treeWidget.selectedItems()) != 0:#item selected:
+                twi = treeWidget.currentItem()
+                twi = QTreeWidgetItem(twi,['Property','', item],0)
+            self.dynamicLayersList()
+
+
+
+    def addSDLExistingProperty(self):
+        self.addProperty_dlg = mbb_dialog_addproperty(self.criteriaTabs)
+        self.addProperty_dlg.show()
+        result = self.addProperty_dlg.exec_()
+        if result:
+            item = self.addProperty_dlg.item.currentText()
+            property = self.addProperty_dlg.property.currentText()
+
+            tab = self.SDLItems.currentWidget()
+
+            treeWidget = tab.children()[1]
+            if len(treeWidget.selectedItems()) != 0:#item selected:
+                twi = treeWidget.currentItem()
+                twi = QTreeWidgetItem(twi,['Existing Property',item,''],0)
+            self.dynamicLayersList()
+
+
+    def addSDLCriteria(self):
+        self.addProperty_dlg = mbb_dialog_addproperty(self.criteriaTabs)
+        self.addProperty_dlg.show()
+        result = self.addProperty_dlg.exec_()
+        if result:
+            item = self.addProperty_dlg.item.currentText()
+            property = self.addProperty_dlg.property.currentText()
+
+            tab = self.SDLItems.currentWidget()
+
+            treeWidget = tab.children()[1]
+            if len(treeWidget.selectedItems()) != 0:#item selected:
+                twi = treeWidget.currentItem()
+                twi = QTreeWidgetItem(twi,['Criteria',item, property],0)
+            self.dynamicLayersList()
+
+
+    def removeSDLFeature(self):
+        tab = self.SDLItems.currentWidget()
+        tw = tab.children()[1]
+
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx == -1:
+                twi = item.parent()
+                idx = twi.indexOfChild(item)
+                twi.takeChild(idx)
+        self.dynamicLayersList()
+
+
+#
     def returnValues(self):
 
         return self.headerLength, os.path.join(self.setupPath, self.setupName + ".QMapSetup"), self.template, self.templateMaps
@@ -248,6 +631,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             return False
         else:
             #print(self.templateMaps)
+
+
             return True
 
     def loadExistingFile(self, item, fileType):
@@ -257,21 +642,94 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def dynamicLayersList(self):
         self.dynamicLayers = []
-        layers = self.layers.copy()
-        searchLists = [[],[],[]]
-        searchLists[0] = self.createSearchList(self.tTree)
-        searchLists[1] = self.createSearchList(self.eTree)
-        searchLists[2] = self.createSearchList(self.sTree)
+        lyrs = list(self.layers)
+        for lyr in lyrs:
+            lyr[1]=[]
+        searchLists = []
+        headerLabels=['Lead Dynamic Layer']
+        for i in range(0, self.criteriaTabs.count()):
+            tab = self.criteriaTabs.widget(i)
+            treeWidget = tab.children()[1]
+            searchList = self.createSearchList(treeWidget)
+            headerLabels.append(self.criteriaTabs.tabText(i))
+            lyrs = self.deepSearch(lyrs,searchList)
 
-        for searchList in searchLists:
-            layers = self.deepSearch(layers,searchList)
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            treeWidget = tab.children()[1]
+            headerLabels.append('<><> SECONDARY <><> ' + self.SDLItems.tabText(i))
 
 
-        self.previewList.clear()
-        for layer in layers:
-            self.previewList.addItem(layer.name())
 
-        self.dynamicLayers = layers
+        self.previewTree.clear()
+        self.previewTree.setColumnCount(0)
+        self.previewTree.setHeaderLabels(headerLabels)
+
+        sdlCon = []
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            treeWidget = tab.children()[1]
+            sdlIterator = QTreeWidgetItemIterator(treeWidget)
+            crit =  []
+            prop = []
+            while sdlIterator.value():
+                sdlItem = sdlIterator.value()
+                if sdlItem.childCount() == 0:
+                    if sdlItem.text(0) == 'Criteria':
+                        crit.append(sdlItem.text(2))
+                    elif sdlItem.text(0) == 'Property':
+                        prop.append(sdlItem.text(2))
+                    elif sdlItem.text(0) == 'Existing Property':
+                        prop.append('<<E>>' + sdlItem.text(1))
+                else:
+                    sdlCon.append([crit,prop])
+                    crit =  []
+                    prop = []
+
+
+                sdlIterator += 1
+            sdlCon.append([crit,prop])
+
+        #print(sdlCon)
+
+
+
+        for layer in lyrs:
+            #print(layer)
+            cols = []
+            cols.append(layer[0].name())
+            cols.extend(layer[1])
+
+            #ADD SDL to cols
+
+            for sdl in sdlCon:
+                sd = []
+                out =''
+                if len(sdl[0])>0 or len(sdl[1])>0:
+                    op = True
+                    for cr in sdl[0]:
+                        if cr not in layer[0].name():
+                            op = False
+
+                    if op:
+                        #print(sdl[1])
+                        #print(self.layers)
+                        for ly in self.layers:
+                            lyp = True
+                            for pr in sdl[1]:
+                                if pr not in ly[0].name():
+                                    lyp = False
+                            if lyp:
+                                #print(ly)
+                                sd.append(ly[0].name())
+                    out = '|'.join(sd)
+                    cols.append(out)
+
+
+
+            twi = QTreeWidgetItem(self.previewTree,cols,0)
+            #print(layer[1])
+        self.dynamicLayers = lyrs
         if len(self.dynamicLayers) > 0:
             return True
         else:
@@ -287,105 +745,54 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             reader = list(csv.reader(csvfile, delimiter=','))
             headerLength = reader[0][1]
 
+#Map Items
     def selectMapItems(self):
-        for i in range(0, self.mapItems.count()  - 1):
+        for i in range(0, self.mapItems.count()):
             self.mapItems.removeTab(i)
+
         for mapItem in self.templateMaps:
-            tabLayout = QWidget()
-            print(mapItem.displayName())
-            self.mapItems.insertTab(self.mapItems.count(), tabLayout, mapItem.displayName())
+            tab = QWidget()
+            tabTree = QTreeWidget()
+            tabLayout = QVBoxLayout()
+            tabLayout.addWidget(tabTree)
+            tabLayout.setSizeConstraint(QLayout.SetFixedSize)
+            tabTree.setFixedWidth(810)
+            tabTree.setFixedHeight(550)
+            tabTree.setColumnCount(2)
+            tabTree.setHeaderLabels(['Layer Name', 'Included in Legend'])
+            tab.setLayout(tabLayout)
+            self.mapItems.insertTab(self.mapItems.count(), tab, mapItem.displayName())
+
 
         return True
 
-    def confirmMapItems(self):
-        self.mapsHeaderQMS = []
-        self.mapsDetailsQMS = []
+    def addMapItem(self):
+        self.addmap_dlg = mbb_dialog_addmap()
+        layerList = self.addmap_dlg.layerList
+        layers = QgsProject.instance().mapLayers()
+        layerList.clear()
+        layerList.addItem('<><> LEAD DYNAMIC LAYER <><>')
+        for i in range(0, self.SDLItems.count()):
+            tab = self.SDLItems.widget(i)
+            layerList.addItem('<><> SECONDARY <><> ' + self.SDLItems.tabText(i))
 
-        for map in self.templateMaps:
-            self.mapsHeaderQMS.extend([map.displayName() + '_Scale',  map.displayName() + '_Rotation', map.displayName() + '_Layers'])
-            self.mapsDetailsQMS.append([map.displayName])
-        return True
-
-    def deepSearch(self, layers, searchList):
-        output = []
-        for search in searchList:
-            research = []
-            found = []
-            if type(search) == list:
-                for layer in layers:
-
-                    if search[0] == self.otherItem:
-                        search[0] = ''
-                    if (search[0] == '') and (len(searchList) > 1):
-                        negSearch = searchList.copy()
-                        negSearch.remove(search)
-                        if any(x[0] not in layer.name() for x in negSearch):
-                            output.append(layer)
-                            found.append(layer)
-                    else:
-                        if search[0] in layer.name():
-                            research.append(layer)
-                            found.append(layer)
-                for layer in found:
-                    layers.remove(layer)
-                for item in self.deepSearch(research, search[1]):
-                    output.append(item)
-            else:
-
-                for layer in layers:
-                    if search == self.otherItem:
-                        search = ''
-                    if (search == '') and (len(searchList) > 1):
-                        negSearch = searchList.copy()
-                        negSearch.remove(search)
-                        if any(x not in layer.name() for x in negSearch):
-                            output.append(layer)
-                            found.append(layer)
-                    else:
-                        if search in layer.name():
-                            output.append(layer)
-                            found.append(layer)
-                for layer in found:
-                    layers.remove(layer)
+        for layer_id, layer in layers.items():
+            layerList.addItem(layer.name())
 
 
 
-        return output
-
-    def addDynamicItem(self,ty):
-        self.additem_dlg = mbb_dialog_additem()
-        self.additem_dlg.show()
-        result = self.additem_dlg.exec_()
+        self.addmap_dlg.show()
+        result = self.addmap_dlg.exec_()
         if result:
-            item = self.additem_dlg.coreText.text()
-            if ty == 0:
-                twi = QTreeWidgetItem(self.tTree,[item],0)
-                #twi.addChild(QTreeWidgetItem([self.otherItem],0))
-                #self.tTree.expandItem(twi)
-            elif ty == 1:
-                twi = QTreeWidgetItem(self.eTree,[item],0)
-                #twi.addChild(QTreeWidgetItem([self.otherItem],0))
-                #self.eTree.expandItem(twi)
-            elif ty == 2:
-                twi = QTreeWidgetItem(self.sTree,[item],0)
-                twi.addChild(QTreeWidgetItem([self.otherItem],0))
-                self.sTree.expandItem(twi)
-            elif ty == 3:
-                twi = self.sTree.currentItem()
-                twi = QTreeWidgetItem(twi,[item],0)
-                twi.addChild(QTreeWidgetItem([self.otherItem],0))
-                self.sTree.expandItem(twi)
-                self.sTree.expandItem(twi)
+            tab = self.mapItems.currentWidget()
+            treeWidget = tab.children()[1]
+            for layer in layerList.selectedItems():
+                item = layer.text()
+                twi = QTreeWidgetItem(treeWidget,[item],0)
 
-            self.dynamicLayersList()
-
-    def removeDynamicItem(self,ty):
-        if ty == 0:
-            tw = self.tTree
-        elif ty == 1:
-            tw = self.eTree
-        elif ty == 2:
-            tw = self.sTree
+    def removeMapItem(self):
+        tab = self.mapItems.currentWidget()
+        tw = tab.children()[1]
 
         for item in tw.selectedItems():
             idx = tw.indexOfTopLevelItem(item)
@@ -396,14 +803,120 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 idx = twi.indexOfChild(item)
                 twi.takeChild(idx)
 
+    def moveUpMapItem(self):
+        tab = self.mapItems.currentWidget()
+        tw = tab.children()[1]
 
-        self.dynamicLayersList()
+        for item in tw.selectedItems():
+            idx = tw.indexOfTopLevelItem(item)
+            if idx != -1:
+                if idx > 0:
+                    item = tw.takeTopLevelItem(idx)
+                    tw.insertTopLevelItem(idx - 1, item)
+                    tw.setCurrentItem(item)
+
+            else:
+                twi = item.parent()
+                idx = twi.indexOfChild(item)
+                if idx > 0:
+                    item = twi.takeChild(idx)
+                    twi.insertChild(idx - 1, item)
+                    tw.setCurrentItem(item)
+
+
+
+    def confirmMapItems(self):
+        self.mapsHeaderQMS = []
+        self.mapsDetailsQMS = []
+
+        for map in self.templateMaps:
+            self.mapsHeaderQMS.extend([map.displayName() + '_Scale',  map.displayName() + '_Rotation', map.displayName() + '_Layers'])
+            self.mapsDetailsQMS.append([map.displayName])
+        return True
+
+#Search Tools
+    def deepSearch(self, layers, searchList):
+        #print(layers)
+        #print(searchList)
+        output = []
+        for search in searchList:
+
+            research = []
+            found = []
+            if type(search) == list:
+                #print('500')
+                #print(search)
+
+                for layer in layers:
+
+                    #if search[0] == self.otherItem:
+                    #    search[0] = ''
+                    if (search[0][0] == self.otherItem) and (len(searchList) > 1):
+                        negSearch = searchList.copy()
+                        negSearch.remove(search)
+                        if any(x[0][0] not in layer[0].name() for x in negSearch):
+                            #print('510')
+                            #print(x[0][1])
+                            layer[1].append(search[0][1])
+                            output.append(layer)
+                            #print(output)
+                            found.append(layer)
+                    else:
+                        if search[0] == self.otherItem:
+                            search = ('',search[1])
+                        if search[0][0] in layer[0].name():
+                            research.append(layer)
+                            found.append(layer)
+                for layer in found:
+                    layers.remove(layer)
+
+                #print(research)
+                #print(search[1])
+                for item in self.deepSearch(research, search[1]):
+                    #print('520')
+                    #print(item)
+                    #print(search[1][0][1])
+                    #item[1].append(search[1][0][1])
+                    output.append(item)
+                    #print(output)
+            else:
+                #print('520')
+                #print(search)
+
+                for layer in layers:
+                    if (search[0] == self.otherItem) and (len(searchList) > 1):
+                        negSearch = searchList.copy()
+                        #print(negSearch)
+                        #print(search)
+                        negSearch.remove(search)
+                        #print(negSearch)
+                        if any(x[0] not in layer[0].name() for x in negSearch):
+                            #print('537')
+                            #print(x[1])
+                            layer[1].append(search[1])
+                            output.append(layer)
+                            #print(output)
+                            found.append(layer)
+                    else:
+                        if search[0] == self.otherItem:
+                            search = ('',search[1])
+                        if search[0] in layer[0].name():
+                            #print('545')
+                            #print(search[1])
+                            layer[1].append(search[1])
+                            output.append(layer)
+                            #print(output)
+                            found.append(layer)
+                for layer in found:
+                    layers.remove(layer)
+        return output
 
     def createSearchList(self, treeWidget):
         items = []
         searchList = []
         for idx in range(treeWidget.topLevelItemCount()):
             items.append(treeWidget.topLevelItem(idx))
+        #print(items)
         searchList = self.createSearchLists(items)
         return searchList
 
@@ -417,19 +930,19 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                         items.append(item.child(idx))
                     rList = self.createSearchLists(items)
                 else:
-                    rList = ['']
+                    rList = [('',item.text(1))]
 
-                searchList.append([item.text(0), rList])
+                searchList.append([(item.text(0), item.text(1)), rList])
         else:
             for item in levelItems:
-                searchList.append(item.text(0))
+                searchList.append((item.text(0), item.text(1)))
 
         return searchList
 
     def load_all_layers(self, group, layers):
         for child in group:
             if isinstance(child, QgsLayerTreeLayer):
-                layers.append(child)
+                layers.append(child,[])
             elif isinstance(child, QgsLayerTreeGroup):
                 layers = self.load_all_layers(child.children(), layers)
         return layers
