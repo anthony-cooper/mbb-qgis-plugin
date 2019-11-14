@@ -365,6 +365,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             tabTree.setHeaderLabels(['Search Text', 'Written Text'])
             tab.setLayout(tabLayout)
             self.criteriaTabs.insertTab(self.criteriaTabs.count(), tab, criteria)
+            self.criteriaTabs.setCurrentWidget(tab)
             #print(tab.children())
             self.dynamicLayersList()
 
@@ -477,6 +478,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             tabTree.setColumnCount(3)
             tab.setLayout(tabLayout)
             self.SDLItems.insertTab(self.SDLItems.count(), tab, SDL)
+            self.SDLItems.setCurrentWidget(tab)
             #print(tab.children())
             self.dynamicLayersList()
 
@@ -500,6 +502,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             twi = QTreeWidgetItem(treeWidget,[item],0)
             treeWidget.expandItem(twi)
             self.dynamicLayersList()
+            treeWidget.setCurrentItem(twi)
 
     def removeSDLItem(self):
         tab = self.SDLItems.currentWidget()
@@ -527,6 +530,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Property','', item],0)
+                treeWidget.setCurrentItem(twi.parent())
+
             self.dynamicLayersList()
 
 
@@ -545,6 +550,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Existing Property',item,''],0)
+                treeWidget.setCurrentItem(twi.parent())
+
             self.dynamicLayersList()
 
 
@@ -562,6 +569,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Criteria',item, property],0)
+                treeWidget.setCurrentItem(twi.parent())
+
             self.dynamicLayersList()
 
 
@@ -730,6 +739,10 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             twi = QTreeWidgetItem(self.previewTree,cols,0)
             #print(layer[1])
         self.dynamicLayers = lyrs
+
+        for idx in range(len(headerLabels)):
+            self.previewTree.resizeColumnToContents(idx-1)
+
         if len(self.dynamicLayers) > 0:
             return True
         else:
