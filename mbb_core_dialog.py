@@ -270,6 +270,16 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
     #         self.save_tree(treeWidget)
     #
     #RESTORE
+                # self.tree=QtGui.QTreeWidget(self)                #
+                # self.tree.setObjectName("treeWidget")            #
+                # self.add_button=QtGui.QPushButton("Add", self)   # Initialize a simple
+                # self.save_button=QtGui.QPushButton("Save", self) # form containing a
+                # gridlayout = QtGui.QGridLayout(self)             # treeWidget, an
+                # gridlayout.addWidget(self.tree,1,0,1,9)          # 'Add' button, and a
+                # gridlayout.addWidget(self.add_button,2,0,2,3)    # 'Save' button
+                # gridlayout.addWidget(self.save_button,2,3,2,3)   #
+                # self.tree.headerItem().setText(0,"Label")        #
+
     #         file = QtCore.QFile('native_tree_save.qfile')
     #         file.open(QtCore.QIODevice.ReadOnly)
     #         datastream = QtCore.QDataStream(file)
@@ -328,6 +338,12 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             datastream.writeUInt32(num_childs)
             self.save_item(child,datastream)
 
+    def restore_item(self,datastream,item,num_childs):
+        for i in range(0, num_childs):
+            child=QtGui.QTreeWidgetItem(item)
+            child.read(datastream)
+            num_childs=datastream.readUInt32()
+            self.restore_item(datastream,child,num_childs)
 
 #Lead Dynamic Layers
     def addCriteriaTab(self):
@@ -422,12 +438,16 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 if idx > 0:
                     item = tw.takeTopLevelItem(idx)
                     tw.insertTopLevelItem(idx - 1, item)
+                    tw.setCurrentItem(item)
+
             else:
                 twi = item.parent()
                 idx = twi.indexOfChild(item)
                 if idx > 0:
                     item = twi.takeChild(idx)
                     twi.insertChild(idx - 1, item)
+                    tw.setCurrentItem(item)
+
 
 
         self.dynamicLayersList()
@@ -793,12 +813,17 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                 if idx > 0:
                     item = tw.takeTopLevelItem(idx)
                     tw.insertTopLevelItem(idx - 1, item)
+                    tw.setCurrentItem(item)
+
             else:
                 twi = item.parent()
                 idx = twi.indexOfChild(item)
                 if idx > 0:
                     item = twi.takeChild(idx)
                     twi.insertChild(idx - 1, item)
+                    tw.setCurrentItem(item)
+
+
 
     def confirmMapItems(self):
         self.mapsHeaderQMS = []
