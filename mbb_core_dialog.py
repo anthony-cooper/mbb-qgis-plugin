@@ -365,6 +365,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             tabTree.setHeaderLabels(['Search Text', 'Written Text'])
             tab.setLayout(tabLayout)
             self.criteriaTabs.insertTab(self.criteriaTabs.count(), tab, criteria)
+            self.criteriaTabs.setCurrentWidget(tab)
             #print(tab.children())
             self.dynamicLayersList()
 
@@ -477,6 +478,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             tabTree.setColumnCount(3)
             tab.setLayout(tabLayout)
             self.SDLItems.insertTab(self.SDLItems.count(), tab, SDL)
+            self.SDLItems.setCurrentWidget(tab)
             #print(tab.children())
             self.dynamicLayersList()
 
@@ -500,6 +502,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             twi = QTreeWidgetItem(treeWidget,[item],0)
             treeWidget.expandItem(twi)
             self.dynamicLayersList()
+            treeWidget.setCurrentItem(twi)
 
     def removeSDLItem(self):
         tab = self.SDLItems.currentWidget()
@@ -527,6 +530,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Property','', item],0)
+                treeWidget.setCurrentItem(twi.parent())
+
             self.dynamicLayersList()
 
 
@@ -545,6 +550,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Existing Property',item,''],0)
+                treeWidget.setCurrentItem(twi.parent())
+
             self.dynamicLayersList()
 
 
@@ -562,6 +569,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             if len(treeWidget.selectedItems()) != 0:#item selected:
                 twi = treeWidget.currentItem()
                 twi = QTreeWidgetItem(twi,['Criteria',item, property],0)
+                treeWidget.setCurrentItem(twi.parent())
+
             self.dynamicLayersList()
 
 
@@ -664,15 +673,17 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.previewTree.clear()
         self.previewTree.setColumnCount(0)
         self.previewTree.setHeaderLabels(headerLabels)
-
-        sdlCon = []
+        sdlCons = []
         for i in range(0, self.SDLItems.count()):
             tab = self.SDLItems.widget(i)
             treeWidget = tab.children()[1]
             sdlIterator = QTreeWidgetItemIterator(treeWidget)
+            sdlCon=[]
             crit =  []
             prop = []
+            #print('SDL')
             while sdlIterator.value():
+                #print(sdlIterator.value().text(0))
                 sdlItem = sdlIterator.value()
                 if sdlItem.childCount() == 0:
                     if sdlItem.text(0) == 'Criteria':
@@ -689,8 +700,9 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
                 sdlIterator += 1
             sdlCon.append([crit,prop])
+            sdlCons.append(sdlCon)
 
-        #print(sdlCon)
+            #print(sdlCon)
 
 
 
@@ -701,35 +713,48 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             cols.extend(layer[1])
 
             #ADD SDL to cols
+            for sdlCon in sdlCons:
+                colO=''
+                outs=[]
+                for sdl in sdlCon:
+                    sd = []
+                    out =''
+                    if len(sdl[0])>0 or len(sdl[1])>0:
+                        op = True
+                        for cr in sdl[0]:
+                            if cr not in layer[0].name():
+                                op = False
 
-            for sdl in sdlCon:
-                sd = []
-                out =''
-                if len(sdl[0])>0 or len(sdl[1])>0:
-                    op = True
-                    for cr in sdl[0]:
-                        if cr not in layer[0].name():
-                            op = False
+                        if op:
+                            #print(sdl[1])
+                            #print(self.layers)
+                            for ly in self.layers:
+                                lyp = True
+                                for pr in sdl[1]:
+                                    if pr not in ly[0].name():
+                                        lyp = False
+                                if lyp:
+                                    #print(ly)
+                                    sd.append(ly[0].name())
+                        out = '|'.join(sd)
+                        outs.append(out)
+                colO = '|'.join(outs)
+                if colO[-1:] == '|':
+                    colO = colO[:-1]
+                if colO[:1] == '|':
+                    colO = colO[1:]
 
-                    if op:
-                        #print(sdl[1])
-                        #print(self.layers)
-                        for ly in self.layers:
-                            lyp = True
-                            for pr in sdl[1]:
-                                if pr not in ly[0].name():
-                                    lyp = False
-                            if lyp:
-                                #print(ly)
-                                sd.append(ly[0].name())
-                    out = '|'.join(sd)
-                    cols.append(out)
+                cols.append(colO)
 
 
 
             twi = QTreeWidgetItem(self.previewTree,cols,0)
             #print(layer[1])
         self.dynamicLayers = lyrs
+
+        for idx in range(len(headerLabels)):
+            self.previewTree.resizeColumnToContents(idx-1)
+
         if len(self.dynamicLayers) > 0:
             return True
         else:
