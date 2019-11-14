@@ -83,6 +83,8 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
         self.addMap.clicked.connect(lambda: self.addMapItem())
         self.removeMap.clicked.connect(lambda: self.removeMapItem())
         self.upMap.clicked.connect(lambda: self.moveUpMapItem())
+        self.duplicateMap.clicked.connect(lambda: self.duplMap())
+
 
 
         self.existingTemplateBrowser.clicked.connect(lambda: self.loadExistingFile(self.existingTemplate, 'QGIS Print Composer Template (*.qpt)'))
@@ -772,21 +774,22 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
 #Map Items
     def selectMapItems(self):
-        for i in range(0, self.mapItems.count()):
-            self.mapItems.removeTab(i)
+        if self.mapItems.count() != len(self.templateMaps):
+            for i in range(0, self.mapItems.count()):
+                self.mapItems.removeTab(i)
 
-        for mapItem in self.templateMaps:
-            tab = QWidget()
-            tabTree = QTreeWidget()
-            tabLayout = QVBoxLayout()
-            tabLayout.addWidget(tabTree)
-            tabLayout.setSizeConstraint(QLayout.SetFixedSize)
-            tabTree.setFixedWidth(810)
-            tabTree.setFixedHeight(550)
-            tabTree.setColumnCount(2)
-            tabTree.setHeaderLabels(['Layer Name', 'Included in Legend'])
-            tab.setLayout(tabLayout)
-            self.mapItems.insertTab(self.mapItems.count(), tab, mapItem.displayName())
+            for mapItem in self.templateMaps:
+                tab = QWidget()
+                tabTree = QTreeWidget()
+                tabLayout = QVBoxLayout()
+                tabLayout.addWidget(tabTree)
+                tabLayout.setSizeConstraint(QLayout.SetFixedSize)
+                tabTree.setFixedWidth(810)
+                tabTree.setFixedHeight(550)
+                tabTree.setColumnCount(2)
+                tabTree.setHeaderLabels(['Layer Name', 'Included in Legend'])
+                tab.setLayout(tabLayout)
+                self.mapItems.insertTab(self.mapItems.count(), tab, mapItem.displayName())
 
 
         return True
@@ -806,6 +809,7 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
 
 
 
+
         self.addmap_dlg.show()
         result = self.addmap_dlg.exec_()
         if result:
@@ -814,6 +818,9 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
             for layer in layerList.selectedItems():
                 item = layer.text()
                 twi = QTreeWidgetItem(treeWidget,[item],0)
+
+            treeWidget.resizeColumnToContents(0)
+            treeWidget.resizeColumnToContents(1)
 
     def removeMapItem(self):
         tab = self.mapItems.currentWidget()
@@ -847,6 +854,23 @@ class mbb_qgis_pluginDialog(QtWidgets.QDialog, FORM_CLASS):
                     item = twi.takeChild(idx)
                     twi.insertChild(idx - 1, item)
                     tw.setCurrentItem(item)
+
+    def duplMap(self):
+        tab = self.mapItems.currentWidget()
+        tw = tab.children()[1]
+        tw0 = (self.mapItems.widget(0)).children()[1]
+
+        tw0Iterator = QTreeWidgetItemIterator(tw0)
+        while tw0Iterator.value():
+            tw0Item = tw0Iterator.value()
+            twi = QTreeWidgetItem(tw,[tw0Item.text(0)],0)
+
+            tw0Iterator += 1
+
+        treeWidget.resizeColumnToContents(0)
+        treeWidget.resizeColumnToContents(1)
+
+
 
 
 
